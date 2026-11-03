@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "OLC Assembler: overlap-layout-consensus assembly of Sanger fragments and Oxford Nanopore amplicon reads"
+type: software
+version: 1.0.0
+date-released: 2026-11-03
+license: GPL-3.0-or-later
+repository-code: "https://github.com/rkalendar/olc-assembler"
+url: "https://digitalgens.org/cap.html"
+authors:
+  - family-names: Kalendar
+    given-names: Ruslan
+preferred-citation:
+  type: article
+  title: "Comprehensive web-based platform for advanced PCR design, genotyping, synthetic biology, molecular diagnostics, and sequence analysis"
+  authors:
+    - family-names: Kalendar
+      given-names: Ruslan
+  journal: "Molecular Therapy Nucleic Acids"
+  volume: 36
+  issue: 4
+  start: 102716
+  year: 2025
+  doi: 10.1016/j.omtn.2025.102716

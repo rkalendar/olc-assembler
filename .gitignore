@@ -1,0 +1,5 @@
+# assemblies written while trying the tool
+runs/
+examples/**/out/
+# npm
+node_modules/

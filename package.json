@@ -1,0 +1,37 @@
+{
+  "name": "olc-assembler",
+  "version": "1.0.0",
+  "description": "Overlap-layout-consensus assembler for Sanger fragments and Oxford Nanopore amplicon reads, with a command-line batch mode for whole sequencing runs. The engine of the OLC Assembler page of DigitalGens, run under Node.js.",
+  "bin": {
+    "olc-assembler": "tools/cap-cli.js"
+  },
+  "scripts": {
+    "examples": "node examples/run-examples.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "js/",
+    "tools/",
+    "README.md",
+    "LICENSE.txt",
+    "CITATION.cff"
+  ],
+  "keywords": [
+    "assembly",
+    "overlap-layout-consensus",
+    "CAP3",
+    "Oxford Nanopore",
+    "amplicon",
+    "FASTQ",
+    "bioinformatics"
+  ],
+  "author": "Ruslan Kalendar",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rkalendar/olc-assembler.git"
+  },
+  "homepage": "https://digitalgens.org/cap.html"
+}
