@@ -83,14 +83,14 @@ in the report). Expected (`nanopore/expected/barcode79.bins.tsv` and the report'
 | | |
 |---|---|
 | Reads seen / used | 3119 / 1000 |
-| Reads placed in contigs | 128 |
-| Singletons | 872 |
-| Contigs | 47 |
+| Reads placed in contigs | 130 |
+| Singletons | 870 |
+| Contigs | 48 |
 | Longest contig | 11,858 bp |
 | N50 | 4062 bp |
 | Candidate pairs aligned | 7888 |
-| Overlaps accepted / rejected | 103 / 7785 |
-| Time | about 10 s on three threads, 260 MB |
+| Overlaps accepted / rejected | 102 / 7786 |
+| Time | about 10–15 s on three threads, 260–300 MB |
 
 This example is included for what it shows about real data rather than for a tidy result. Most
 reads stay singletons because the barcode holds many products and the sample of 1000 reads

@@ -4,79 +4,81 @@ OLC Assembler report
 Run summary
 -----------
 Reads used                      1000
-Reads placed in contigs         128
-Singletons (unassembled)        872
-Contigs                         47
-Total consensus                 106921 bp
+Reads placed in contigs         130
+Singletons (unassembled)        870
+Contigs                         48
+Total consensus                 110560 bp
 Longest contig                  11858 bp
 N50                             4062 bp
 Mean coverage                   1.5×
 Candidate pairs aligned         7888
-Overlaps accepted               103
-Overlaps rejected               7785
-Layout conflicts                10
+Overlaps accepted               102
+Overlaps rejected               7786
+Layout conflicts                8
 Polymorphic sites (SNP)         0
 Indel polymorphisms             17
-Unresolved ties (IUPAC)         2005
-Elapsed                         9.21 s on 3 worker threads
+Unresolved ties (IUPAC)         2030
+Elapsed                         12.62 s on 3 worker threads
 
 Parameters
 ----------
 k-mer 12 · min seeds 3 · min overlap 40 nt · min identity 85% · max overhang 30 nt
 scoring: match 2, mismatch -3, gap open -5, gap extend -2 · band ±32 (max ±256)
 polymorphism: minor allele ≥ 25% and ≥ 2 read(s), column coverage ≥ 3 · votes weighted by PHRED quality when supplied
-reverse-complement search: on · chimeric reads: set aside · min read length 40 nt
+reverse-complement search: on · chimeric reads: set aside (fold-back copies ≥ 50 nt trimmed, junctions below 50% local identity refused) · contig ends need ≥ 3 reads (or 5% of the median coverage) in contigs at least twice that deep · min read length 40 nt
 
 Contigs
 -------
-Contig	Length(bp)	Reads	MeanCoverage	MinCoverage	SNP	Indel	Forward	Reverse
-Contig1	11858	2	1.0	1	0	0	2	0
-Contig2	10086	2	1.0	1	0	0	1	1
-Contig3	9671	4	1.9	1	0	0	2	2
-Contig4	8416	2	1.0	1	0	0	1	1
-Contig5	7552	2	1.0	1	0	0	1	1
-Contig6	5102	4	1.5	1	0	0	3	1
-Contig7	4062	8	1.9	1	0	10	5	3
-Contig8	3217	6	1.8	1	0	0	5	1
-Contig9	2904	3	1.2	1	0	0	1	2
-Contig10	2757	2	1.1	1	0	0	2	0
-Contig11	2427	2	1.1	1	0	0	1	1
-Contig12	2328	3	1.8	1	0	0	2	1
-Contig13	2279	2	1.0	1	0	0	2	0
-Contig14	2084	9	2.3	1	0	5	8	1
-Contig15	1974	2	1.2	1	0	0	1	1
-Contig16	1959	2	1.0	1	0	0	2	0
-Contig17	1923	2	1.1	1	0	0	2	0
-Contig18	1822	2	1.5	1	0	0	1	1
-Contig19	1775	3	1.2	1	0	0	3	0
-Contig20	1669	2	1.0	1	0	0	1	1
-Contig21	1574	3	1.8	1	0	0	3	0
-Contig22	1249	4	1.7	1	0	1	3	1
-Contig23	1216	2	1.0	1	0	0	2	0
-Contig24	1216	2	1.2	1	0	0	1	1
-Contig25	1081	2	1.3	1	0	0	2	0
-Contig26	954	2	1.3	1	0	0	1	1
-Contig27	923	2	1.2	1	0	0	1	1
-Contig28	892	3	1.8	1	0	0	3	0
-Contig29	885	2	1.4	1	0	0	2	0
-Contig30	843	5	2.3	1	0	1	1	4
-Contig31	810	2	1.3	1	0	0	1	1
-Contig32	804	3	2.2	1	0	0	2	1
-Contig33	765	2	1.4	1	0	0	2	0
-Contig34	756	2	1.1	1	0	0	1	1
-Contig35	747	2	1.4	1	0	0	2	0
-Contig36	691	2	1.3	1	0	0	1	1
-Contig37	677	2	1.4	1	0	0	1	1
-Contig38	616	2	1.5	1	0	0	2	0
-Contig39	594	3	2.3	1	0	0	2	1
-Contig40	588	2	1.7	1	0	0	2	0
-Contig41	563	2	1.8	1	0	0	1	1
-Contig42	547	2	1.3	1	0	0	2	0
-Contig43	484	2	1.3	1	0	0	2	0
-Contig44	478	2	1.4	1	0	0	1	1
-Contig45	477	3	2.0	1	0	0	2	1
-Contig46	372	2	1.9	1	0	0	1	1
-Contig47	254	2	1.9	1	0	0	1	1
+Trimmed5 and Trimmed3 are consensus bases cut from the two ends because too few reads carried them.
+Contig	Length(bp)	Reads	MeanCoverage	MinCoverage	SNP	Indel	Forward	Reverse	Trimmed5	Trimmed3
+Contig1	11858	2	1.0	1	0	0	2	0	0	0
+Contig2	10086	2	1.0	1	0	0	1	1	0	0
+Contig3	9671	4	1.9	1	0	0	2	2	0	0
+Contig4	8416	2	1.0	1	0	0	1	1	0	0
+Contig5	7552	2	1.0	1	0	0	1	1	0	0
+Contig6	5102	4	1.5	1	0	0	3	1	0	0
+Contig7	4062	8	1.9	1	0	10	5	3	0	0
+Contig8	3639	2	1.1	1	0	0	2	0	0	0
+Contig9	3217	6	1.8	1	0	0	5	1	0	0
+Contig10	2904	3	1.2	1	0	0	1	2	0	0
+Contig11	2757	2	1.1	1	0	0	2	0	0	0
+Contig12	2427	2	1.1	1	0	0	1	1	0	0
+Contig13	2328	3	1.8	1	0	0	2	1	0	0
+Contig14	2279	2	1.0	1	0	0	2	0	0	0
+Contig15	2084	9	2.3	1	0	5	8	1	0	0
+Contig16	1974	2	1.2	1	0	0	1	1	0	0
+Contig17	1959	2	1.0	1	0	0	2	0	0	0
+Contig18	1923	2	1.1	1	0	0	2	0	0	0
+Contig19	1822	2	1.5	1	0	0	1	1	0	0
+Contig20	1775	3	1.2	1	0	0	3	0	0	0
+Contig21	1669	2	1.0	1	0	0	1	1	0	0
+Contig22	1574	3	1.8	1	0	0	3	0	0	0
+Contig23	1249	4	1.7	1	0	1	3	1	0	0
+Contig24	1216	2	1.0	1	0	0	2	0	0	0
+Contig25	1216	2	1.2	1	0	0	1	1	0	0
+Contig26	1081	2	1.3	1	0	0	2	0	0	0
+Contig27	954	2	1.3	1	0	0	1	1	0	0
+Contig28	923	2	1.2	1	0	0	1	1	0	0
+Contig29	892	3	1.8	1	0	0	3	0	0	0
+Contig30	885	2	1.4	1	0	0	2	0	0	0
+Contig31	843	5	2.3	1	0	1	1	4	0	0
+Contig32	810	2	1.3	1	0	0	1	1	0	0
+Contig33	804	3	2.2	1	0	0	2	1	0	0
+Contig34	765	2	1.4	1	0	0	2	0	0	0
+Contig35	756	2	1.1	1	0	0	1	1	0	0
+Contig36	747	2	1.4	1	0	0	2	0	0	0
+Contig37	691	2	1.3	1	0	0	1	1	0	0
+Contig38	677	2	1.4	1	0	0	1	1	0	0
+Contig39	616	2	1.5	1	0	0	2	0	0	0
+Contig40	594	3	2.3	1	0	0	2	1	0	0
+Contig41	588	2	1.7	1	0	0	2	0	0	0
+Contig42	563	2	1.8	1	0	0	1	1	0	0
+Contig43	547	2	1.3	1	0	0	2	0	0	0
+Contig44	484	2	1.3	1	0	0	2	0	0	0
+Contig45	478	2	1.4	1	0	0	1	1	0	0
+Contig46	477	3	2.0	1	0	0	2	1	0	0
+Contig47	372	2	1.9	1	0	0	1	1	0	0
+Contig48	254	2	1.9	1	0	0	1	1	0	0
 
 Read placement
 --------------
@@ -106,110 +108,112 @@ Contig7	dbd34c57-c77f-424a-b132-2158f320682a	-	2402	2844	440	0	0
 Contig7	0b2c726c-1b5f-4d8f-a232-56e0457fe633	+	2580	2841	261	0	0
 Contig7	8187ea6b-b278-425b-8fff-136ade05437f	+	2794	3013	222	0	0
 Contig7	15971286-8bca-4b1f-8fa7-779cddf2d2fb	+	3066	4062	997	0	0
-Contig8	06908f09-8444-477d-9764-870538fa942f	+	1	1158	1141	0	0
-Contig8	b39b412d-157f-43b2-9448-3d2dce3c8f10	-	503	1687	1173	0	0
-Contig8	d2706abb-b6d5-4b1e-8927-5f2cc8d9f07b	+	920	3217	2216	0	0
-Contig8	0cacdc51-40d1-4b7a-aa3f-33cf2af476b5	+	1467	2149	669	0	0
-Contig8	491b7e20-d47a-4a46-a2ad-db5d6cddc893	+	2159	2497	332	0	0
-Contig8	cb200622-2d44-4bd1-8c93-b5890c90e808	+	2551	2768	211	0	0
-Contig9	7afebd6d-efbc-495b-8440-85e327fdb4c4	+	1	2685	2674	0	0
-Contig9	b3cc4086-8d18-4e14-b750-6d4b88cc58d6	-	1582	1800	209	0	0
-Contig9	ab930474-9ef3-4cd3-a24c-c77f188db012	-	2264	2904	617	0	0
-Contig10	cec3bf94-453e-4988-868b-7a2cd33b56f8	+	1	2409	2405	0	0
-Contig10	b7115fd7-b270-4d36-b3d8-84f573231ab9	+	2170	2757	585	0	0
-Contig11	9ec1801a-8ca4-467f-a6bc-6aa4c4294db7	-	1	2427	2423	0	0
-Contig11	e292e3f9-d630-4232-8fe8-84dea3cacfed	+	474	706	227	0	0
-Contig12	7e7504e7-4dae-441e-9476-5829acdd2455	+	1	1042	1021	0	0
-Contig12	75f1c5cb-28e0-4e82-b74a-106f4e423667	-	385	2019	1566	0	0
-Contig12	ef0643fc-52e4-4673-8fe7-59ca2ab30b21	+	905	2328	1392	0	0
-Contig13	78f5db40-80ec-44f9-995d-7b84d0f80dc8	+	1	277	272	0	0
-Contig13	dd95fadc-43a5-4c5d-a2d0-e1469ec8c43f	+	221	2279	2059	0	0
-Contig14	3f26901d-b915-4acb-b693-c0a822e6512d	+	1	657	630	0	0
-Contig14	a4085e0f-b63f-4dd2-9e98-768b0a0c2329	+	30	732	690	0	0
-Contig14	307d9b72-5641-4734-85d7-3adfcba8b40c	+	667	1512	820	0	0
-Contig14	e243eadc-8932-473f-b887-b0ea006fdb67	+	668	1008	338	0	0
-Contig14	3c5ba7d8-9c9e-4568-b0e7-297012b77191	+	841	1099	252	0	0
-Contig14	b5f03d87-d7d3-4fc7-b64e-e09b52a1dfee	+	846	1371	515	0	0
-Contig14	56a0c06f-7579-405b-b64d-fde691b825dd	-	1115	1676	550	0	0
-Contig14	0cfa8a14-768e-4d55-94f7-64a1a8b7112d	+	1348	1605	252	0	0
-Contig14	c5a22c75-7f32-4078-a33c-57ad443a4a47	+	1435	2084	641	0	0
-Contig15	4f6623bd-534c-471f-8180-0d49235543db	+	1	1974	1958	0	0
-Contig15	9169b14f-845a-4423-88c1-20258f56c4d7	-	62	547	470	0	0
-Contig16	20330ebe-7dcb-4af0-a02b-d4014fad50e3	+	1	355	354	0	0
-Contig16	a45c3696-2bdd-440a-b5c6-b2c3710f3e30	+	261	1959	1697	0	0
-Contig17	f28575b8-16b5-4089-94cc-476a532253e3	+	1	552	549	0	0
-Contig17	439b4d68-9b21-4b96-adff-5aca90e56c58	+	305	1923	1615	0	0
-Contig18	a512e3ab-a48a-459a-a991-a9c1088f4cb2	+	1	1822	1806	0	0
-Contig18	be0d125b-2696-4b51-b24e-706edc8ac231	-	614	1483	839	0	0
-Contig19	aed47d9d-c8b0-453c-8fe7-d2377abc25ac	+	1	1542	1537	0	0
-Contig19	f1514716-05e9-4e2f-84a7-85ecc88d9aac	+	965	1207	233	0	0
-Contig19	64842498-1461-4ae0-87e6-7ebb2a5f2431	+	1451	1775	324	0	0
-Contig20	5527b9af-d7d3-4ff0-8eef-a06f4ace69ce	+	1	370	370	0	0
-Contig20	7d79cc5b-8036-4f67-aca6-2eb3346f6e60	-	300	1669	1368	0	0
-Contig21	bfa04fbb-a683-4142-b466-6e3c20c9a80c	+	1	1574	1531	0	0
-Contig21	d2cc8593-da1c-4e43-b51c-aef485dc3e2d	+	184	812	603	0	0
-Contig21	32776c78-92a0-4b80-9983-e84c49db6f5f	+	765	1333	554	0	0
-Contig22	08807006-2394-4dd0-9dc8-33f4088ed624	-	1	1004	983	0	0
-Contig22	68456d8c-63d0-4f65-a695-baa4ee6a19cf	+	612	1117	479	0	0
-Contig22	2abbf168-302f-492a-b3be-f1eb2c56455f	+	882	1226	332	0	0
-Contig22	f00a7fd5-9359-4943-bf1f-7130d878a2d5	+	950	1249	299	0	0
-Contig23	c9cf03e8-d03c-4358-a35f-aeb3df12ed25	+	1	523	520	0	0
-Contig23	c35fa90f-6a11-46fe-a932-b728cbcce4a0	+	469	1216	748	0	0
-Contig24	d26b153f-17cd-4a8f-a53a-e5562bb7180c	+	1	1216	1213	0	0
-Contig24	dbcd2574-f864-44e3-bb41-32009ddd34ba	-	279	483	201	0	0
-Contig25	c48eafb8-c9e5-4d9c-8ac7-a8f42910071f	+	1	1081	1071	0	0
-Contig25	50252603-3299-4667-943e-6620ec1c5e7f	+	45	378	325	0	0
-Contig26	caa610a8-1e81-4562-8111-8b7481de91a5	-	1	494	486	0	0
-Contig26	5eac468d-700c-41fe-86a7-e5eb1aa69a16	+	234	954	720	0	0
-Contig27	5fcd678d-ce7f-4217-9118-3f21384aa032	+	1	526	519	0	0
-Contig27	9683458e-494d-45a3-abef-9077a932ae1f	-	307	923	610	0	0
-Contig28	d7d930f3-3990-4d10-814c-43943ca319c5	+	1	892	868	0	0
-Contig28	be547335-2e34-440b-8d04-defaf60baded	+	213	639	422	0	0
-Contig28	7d60b9db-0e2c-4296-971f-161df8db4117	+	542	800	257	0	0
-Contig29	1927034c-a164-4c92-a81a-4768cb9a7064	+	1	884	872	0	0
-Contig29	4427da20-5714-4597-9143-a53c04882b43	+	555	885	329	0	0
-Contig30	48783287-d93e-457a-8f33-a92c6eb32d5e	-	1	321	320	0	0
-Contig30	acc90fbc-1206-499a-9d57-03381dc9aa52	-	64	411	347	0	0
-Contig30	6e023150-40e2-4281-8fab-61d3c29e9abe	-	72	411	335	0	0
-Contig30	941c5028-cd50-4e7c-b5fa-9e4331b289c8	-	181	465	284	0	0
-Contig30	63670a27-f2bd-4047-89b8-7a3978916e58	+	194	843	653	0	0
-Contig31	6a86dd6a-811b-4b59-bb87-8708ea409f48	-	1	810	807	0	0
-Contig31	9da32e8c-18e1-4b7e-9e23-9db18be72120	+	413	693	275	0	0
-Contig32	e879febd-8a55-4f81-9418-3bdfed338329	+	1	804	782	0	0
-Contig32	7a602931-faf5-4c65-aea8-6e87d82479cb	+	4	773	763	0	0
-Contig32	bcb405b0-df2f-48e3-82c4-2615cfc355ae	-	573	787	206	0	0
-Contig33	49066b4e-266f-46f7-9e51-f1ac741532f9	+	1	765	763	0	0
-Contig33	e2745213-4ac3-40e7-b080-32f72d9461dd	+	43	343	276	0	0
-Contig34	a932ca3f-8bb8-4fde-8214-f0c4ff6192a5	-	1	538	537	0	0
-Contig34	f8f6073e-f31b-4863-a9f1-d3abf4c6d918	+	453	756	303	0	0
-Contig35	adb8e092-ce3e-4c86-9719-f1fbea66e0a0	+	1	747	739	0	0
-Contig35	d24bccee-b11f-443d-b640-390e08645c27	+	123	444	312	0	0
-Contig36	a7427de7-be25-4d8d-ac50-c12237bd0ba4	-	1	453	444	0	0
-Contig36	b50dcbca-bb4d-479a-beaf-c5a85fb45686	+	238	691	449	0	0
-Contig37	7fd5cf07-4a20-4dd4-a9cc-d633c94fe398	-	1	656	656	0	0
-Contig37	06041d85-7771-4a29-88c8-73dcf7743fc9	+	418	677	254	0	0
-Contig38	dc19ae9d-2776-47af-9215-f8caf330f42e	+	1	616	610	0	0
-Contig38	2740657a-237d-4880-a6ef-f28ff6faf884	+	189	467	264	0	0
-Contig39	b4e96223-2f45-4786-ae09-c027b4229cae	+	1	213	212	0	0
-Contig39	1a14e714-92b6-424e-bc16-6ab65beef897	+	3	594	586	0	0
-Contig39	9426f312-982f-42ac-a818-c278d5ec4ff0	-	39	585	536	0	0
-Contig40	0f0ed01d-373a-419e-b2d3-d83720ee7b81	+	1	586	562	0	0
-Contig40	e1f754ad-1128-4d44-868b-b6879bc30782	+	155	588	429	0	0
-Contig41	05803fc1-2f27-47d2-8660-80b08b7d3650	+	1	496	489	0	0
-Contig41	201acd17-ceb0-4f07-a83a-1e184ef9abba	-	40	563	498	0	0
-Contig42	89070f02-6331-4c6d-ab2c-43ab5c4c2a2c	+	1	314	312	0	0
-Contig42	4e30528d-d955-4f55-a3da-51d8d0dbb9cc	+	125	547	421	0	0
-Contig43	621eefbe-abe7-4747-81e8-5e815a5f579a	+	1	370	366	0	0
-Contig43	7e7fb38e-c3ec-4885-b19e-f94d56e2c20c	+	225	484	260	0	0
-Contig44	e234f99c-4d09-4b02-ba55-e1bad95fb0f7	+	1	455	444	0	0
-Contig44	96dbc4e7-49d8-425c-8337-e0104d0edf62	-	248	478	227	0	0
-Contig45	306ac467-3fb8-4427-a795-038469f2b696	+	1	359	356	0	0
-Contig45	bde71d41-3b0a-4c85-bdfd-7c6288766fc0	+	74	367	289	0	0
-Contig45	a22ae848-cc30-437a-96d9-179cb48665d9	-	165	477	314	0	0
-Contig46	bf6ba8b3-b100-430f-b15f-016b2b121298	+	1	372	369	0	0
-Contig46	ba3b5d48-b6ab-4660-a7e3-5023a6d2047a	-	4	331	309	0	0
-Contig47	1e921371-b31b-44a4-a451-ec77d612dd13	+	1	240	236	0	0
-Contig47	92e46577-24f3-44af-99cf-1c0beff24c73	-	11	254	224	0	0
+Contig8	555acb2c-e8f0-4719-ac89-3f01358e4e06	+	1	953	949	0	0
+Contig8	74ac4007-be0e-4c77-9ff5-8c8156b28bd5	+	416	3639	3200	0	0
+Contig9	06908f09-8444-477d-9764-870538fa942f	+	1	1158	1141	0	0
+Contig9	b39b412d-157f-43b2-9448-3d2dce3c8f10	-	503	1687	1173	0	0
+Contig9	d2706abb-b6d5-4b1e-8927-5f2cc8d9f07b	+	920	3217	2216	0	0
+Contig9	0cacdc51-40d1-4b7a-aa3f-33cf2af476b5	+	1467	2149	669	0	0
+Contig9	491b7e20-d47a-4a46-a2ad-db5d6cddc893	+	2159	2497	332	0	0
+Contig9	cb200622-2d44-4bd1-8c93-b5890c90e808	+	2551	2768	211	0	0
+Contig10	7afebd6d-efbc-495b-8440-85e327fdb4c4	+	1	2685	2674	0	0
+Contig10	b3cc4086-8d18-4e14-b750-6d4b88cc58d6	-	1582	1800	209	0	0
+Contig10	ab930474-9ef3-4cd3-a24c-c77f188db012	-	2264	2904	617	0	0
+Contig11	cec3bf94-453e-4988-868b-7a2cd33b56f8	+	1	2409	2405	0	0
+Contig11	b7115fd7-b270-4d36-b3d8-84f573231ab9	+	2170	2757	585	0	0
+Contig12	9ec1801a-8ca4-467f-a6bc-6aa4c4294db7	-	1	2427	2423	0	0
+Contig12	e292e3f9-d630-4232-8fe8-84dea3cacfed	+	474	706	227	0	0
+Contig13	7e7504e7-4dae-441e-9476-5829acdd2455	+	1	1042	1021	0	0
+Contig13	75f1c5cb-28e0-4e82-b74a-106f4e423667	-	385	2019	1566	0	0
+Contig13	ef0643fc-52e4-4673-8fe7-59ca2ab30b21	+	905	2328	1392	0	0
+Contig14	78f5db40-80ec-44f9-995d-7b84d0f80dc8	+	1	277	272	0	0
+Contig14	dd95fadc-43a5-4c5d-a2d0-e1469ec8c43f	+	221	2279	2059	0	0
+Contig15	3f26901d-b915-4acb-b693-c0a822e6512d	+	1	657	630	0	0
+Contig15	a4085e0f-b63f-4dd2-9e98-768b0a0c2329	+	30	732	690	0	0
+Contig15	307d9b72-5641-4734-85d7-3adfcba8b40c	+	667	1512	820	0	0
+Contig15	e243eadc-8932-473f-b887-b0ea006fdb67	+	668	1008	338	0	0
+Contig15	3c5ba7d8-9c9e-4568-b0e7-297012b77191	+	841	1099	252	0	0
+Contig15	b5f03d87-d7d3-4fc7-b64e-e09b52a1dfee	+	846	1371	515	0	0
+Contig15	56a0c06f-7579-405b-b64d-fde691b825dd	-	1115	1676	550	0	0
+Contig15	0cfa8a14-768e-4d55-94f7-64a1a8b7112d	+	1348	1605	252	0	0
+Contig15	c5a22c75-7f32-4078-a33c-57ad443a4a47	+	1435	2084	641	0	0
+Contig16	4f6623bd-534c-471f-8180-0d49235543db	+	1	1974	1958	0	0
+Contig16	9169b14f-845a-4423-88c1-20258f56c4d7	-	62	547	470	0	0
+Contig17	20330ebe-7dcb-4af0-a02b-d4014fad50e3	+	1	355	354	0	0
+Contig17	a45c3696-2bdd-440a-b5c6-b2c3710f3e30	+	261	1959	1697	0	0
+Contig18	f28575b8-16b5-4089-94cc-476a532253e3	+	1	552	549	0	0
+Contig18	439b4d68-9b21-4b96-adff-5aca90e56c58	+	305	1923	1615	0	0
+Contig19	a512e3ab-a48a-459a-a991-a9c1088f4cb2	+	1	1822	1806	0	0
+Contig19	be0d125b-2696-4b51-b24e-706edc8ac231	-	614	1483	839	0	0
+Contig20	aed47d9d-c8b0-453c-8fe7-d2377abc25ac	+	1	1542	1537	0	0
+Contig20	f1514716-05e9-4e2f-84a7-85ecc88d9aac	+	965	1207	233	0	0
+Contig20	64842498-1461-4ae0-87e6-7ebb2a5f2431	+	1451	1775	324	0	0
+Contig21	5527b9af-d7d3-4ff0-8eef-a06f4ace69ce	+	1	370	370	0	0
+Contig21	7d79cc5b-8036-4f67-aca6-2eb3346f6e60	-	300	1669	1368	0	0
+Contig22	bfa04fbb-a683-4142-b466-6e3c20c9a80c	+	1	1574	1531	0	0
+Contig22	d2cc8593-da1c-4e43-b51c-aef485dc3e2d	+	184	812	603	0	0
+Contig22	32776c78-92a0-4b80-9983-e84c49db6f5f	+	765	1333	554	0	0
+Contig23	08807006-2394-4dd0-9dc8-33f4088ed624	-	1	1004	983	0	0
+Contig23	68456d8c-63d0-4f65-a695-baa4ee6a19cf	+	612	1117	479	0	0
+Contig23	2abbf168-302f-492a-b3be-f1eb2c56455f	+	882	1226	332	0	0
+Contig23	f00a7fd5-9359-4943-bf1f-7130d878a2d5	+	950	1249	299	0	0
+Contig24	c9cf03e8-d03c-4358-a35f-aeb3df12ed25	+	1	523	520	0	0
+Contig24	c35fa90f-6a11-46fe-a932-b728cbcce4a0	+	469	1216	748	0	0
+Contig25	d26b153f-17cd-4a8f-a53a-e5562bb7180c	+	1	1216	1213	0	0
+Contig25	dbcd2574-f864-44e3-bb41-32009ddd34ba	-	279	483	201	0	0
+Contig26	c48eafb8-c9e5-4d9c-8ac7-a8f42910071f	+	1	1081	1071	0	0
+Contig26	50252603-3299-4667-943e-6620ec1c5e7f	+	45	378	325	0	0
+Contig27	caa610a8-1e81-4562-8111-8b7481de91a5	-	1	494	486	0	0
+Contig27	5eac468d-700c-41fe-86a7-e5eb1aa69a16	+	234	954	720	0	0
+Contig28	5fcd678d-ce7f-4217-9118-3f21384aa032	+	1	526	519	0	0
+Contig28	9683458e-494d-45a3-abef-9077a932ae1f	-	307	923	610	0	0
+Contig29	d7d930f3-3990-4d10-814c-43943ca319c5	+	1	892	868	0	0
+Contig29	be547335-2e34-440b-8d04-defaf60baded	+	213	639	422	0	0
+Contig29	7d60b9db-0e2c-4296-971f-161df8db4117	+	542	800	257	0	0
+Contig30	1927034c-a164-4c92-a81a-4768cb9a7064	+	1	884	872	0	0
+Contig30	4427da20-5714-4597-9143-a53c04882b43	+	555	885	329	0	0
+Contig31	48783287-d93e-457a-8f33-a92c6eb32d5e	-	1	321	320	0	0
+Contig31	acc90fbc-1206-499a-9d57-03381dc9aa52	-	64	411	347	0	0
+Contig31	6e023150-40e2-4281-8fab-61d3c29e9abe	-	72	411	335	0	0
+Contig31	941c5028-cd50-4e7c-b5fa-9e4331b289c8	-	181	465	284	0	0
+Contig31	63670a27-f2bd-4047-89b8-7a3978916e58	+	194	843	653	0	0
+Contig32	6a86dd6a-811b-4b59-bb87-8708ea409f48	-	1	810	807	0	0
+Contig32	9da32e8c-18e1-4b7e-9e23-9db18be72120	+	413	693	275	0	0
+Contig33	e879febd-8a55-4f81-9418-3bdfed338329	+	1	804	782	0	0
+Contig33	7a602931-faf5-4c65-aea8-6e87d82479cb	+	4	773	763	0	0
+Contig33	bcb405b0-df2f-48e3-82c4-2615cfc355ae	-	573	787	206	0	0
+Contig34	49066b4e-266f-46f7-9e51-f1ac741532f9	+	1	765	763	0	0
+Contig34	e2745213-4ac3-40e7-b080-32f72d9461dd	+	43	343	276	0	0
+Contig35	a932ca3f-8bb8-4fde-8214-f0c4ff6192a5	-	1	538	537	0	0
+Contig35	f8f6073e-f31b-4863-a9f1-d3abf4c6d918	+	453	756	303	0	0
+Contig36	adb8e092-ce3e-4c86-9719-f1fbea66e0a0	+	1	747	739	0	0
+Contig36	d24bccee-b11f-443d-b640-390e08645c27	+	123	444	312	0	0
+Contig37	a7427de7-be25-4d8d-ac50-c12237bd0ba4	-	1	453	444	0	0
+Contig37	b50dcbca-bb4d-479a-beaf-c5a85fb45686	+	238	691	449	0	0
+Contig38	7fd5cf07-4a20-4dd4-a9cc-d633c94fe398	-	1	656	656	0	0
+Contig38	06041d85-7771-4a29-88c8-73dcf7743fc9	+	418	677	254	0	0
+Contig39	dc19ae9d-2776-47af-9215-f8caf330f42e	+	1	616	610	0	0
+Contig39	2740657a-237d-4880-a6ef-f28ff6faf884	+	189	467	264	0	0
+Contig40	b4e96223-2f45-4786-ae09-c027b4229cae	+	1	213	212	0	0
+Contig40	1a14e714-92b6-424e-bc16-6ab65beef897	+	3	594	586	0	0
+Contig40	9426f312-982f-42ac-a818-c278d5ec4ff0	-	39	585	536	0	0
+Contig41	0f0ed01d-373a-419e-b2d3-d83720ee7b81	+	1	586	562	0	0
+Contig41	e1f754ad-1128-4d44-868b-b6879bc30782	+	155	588	429	0	0
+Contig42	05803fc1-2f27-47d2-8660-80b08b7d3650	+	1	496	489	0	0
+Contig42	201acd17-ceb0-4f07-a83a-1e184ef9abba	-	40	563	498	0	0
+Contig43	89070f02-6331-4c6d-ab2c-43ab5c4c2a2c	+	1	314	312	0	0
+Contig43	4e30528d-d955-4f55-a3da-51d8d0dbb9cc	+	125	547	421	0	0
+Contig44	621eefbe-abe7-4747-81e8-5e815a5f579a	+	1	370	366	0	0
+Contig44	7e7fb38e-c3ec-4885-b19e-f94d56e2c20c	+	225	484	260	0	0
+Contig45	e234f99c-4d09-4b02-ba55-e1bad95fb0f7	+	1	455	444	0	0
+Contig45	96dbc4e7-49d8-425c-8337-e0104d0edf62	-	248	478	227	0	0
+Contig46	306ac467-3fb8-4427-a795-038469f2b696	+	1	359	356	0	0
+Contig46	bde71d41-3b0a-4c85-bdfd-7c6288766fc0	+	74	367	289	0	0
+Contig46	a22ae848-cc30-437a-96d9-179cb48665d9	-	165	477	314	0	0
+Contig47	bf6ba8b3-b100-430f-b15f-016b2b121298	+	1	372	369	0	0
+Contig47	ba3b5d48-b6ab-4660-a7e3-5023a6d2047a	-	4	331	309	0	0
+Contig48	1e921371-b31b-44a4-a451-ec77d612dd13	+	1	240	236	0	0
+Contig48	92e46577-24f3-44af-99cf-1c0beff24c73	-	11	254	224	0	0
 
 Polymorphic sites
 -----------------
@@ -1382,861 +1386,886 @@ Contig7	3379	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far in
 Contig7	3381	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
 Contig7	3401	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
 Contig7	3402	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	562	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	564	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	566	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	571	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	617	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	623	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	624	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	625	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	626	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	636	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	645	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	646	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	647	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	654	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	692	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	693	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	695	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	697	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	698	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	699	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	700	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	705	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	707	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	724	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	725	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	727	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	731	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	733	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	766	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	767	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	768	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	852	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	853	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	855	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	883	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	889	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	916	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1018	tie	3	1	0	1	0	1	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1020	tie	3	1	1	1	0	0	V	33.3	reads split evenly, the bases equally far inside their reads
-Contig8	1172	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1242	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1246	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1252	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1259	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1263	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1265	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1266	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1267	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1268	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1278	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1282	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1290	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1291	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1292	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1293	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1294	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1295	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1297	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1307	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1311	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1342	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1343	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1344	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1345	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1360	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1361	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1362	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1367	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1377	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1393	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1398	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1407	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1453	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1464	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1498	tie	3	1	1	0	1	0	Y	33.3	reads split evenly, the bases equally far inside their reads
-Contig8	1715	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1717	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1718	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1726	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1729	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1731	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1735	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1736	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1741	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1746	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1748	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1749	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1752	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1754	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1757	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1759	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1760	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1773	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1775	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1776	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1777	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1779	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1781	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1786	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1788	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1789	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1793	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1795	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1796	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1797	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1798	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1800	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1802	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1808	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1810	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1812	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1815	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1817	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1818	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1830	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1834	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1836	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1839	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1840	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1842	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1843	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1844	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1847	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1848	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1849	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1852	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1861	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1871	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1872	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1879	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1880	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1883	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1893	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1895	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1902	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1904	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1908	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1909	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1910	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1911	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1915	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1922	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1923	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1926	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1927	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1928	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1931	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1932	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1934	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1935	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1939	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1946	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1949	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1950	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1963	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1964	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1966	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1971	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1972	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1973	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1974	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1976	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1978	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1979	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1981	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1984	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1995	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	1999	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2000	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2001	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2005	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2007	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2012	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2018	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2019	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2020	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2021	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2028	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2031	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2035	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2038	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2041	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2042	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2043	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2044	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2046	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2047	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2048	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2049	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2051	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2053	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2055	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2061	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2063	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2064	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2067	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2072	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2076	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2078	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2080	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2083	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2084	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2085	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2087	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2089	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2092	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2093	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2095	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2211	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2224	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2240	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2250	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2251	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2293	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2306	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2330	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2332	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2333	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2334	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2335	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2383	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2384	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2396	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2403	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2413	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2603	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2604	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2609	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2616	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2617	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2646	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2704	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig8	2706	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig9	1731	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig9	1733	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig9	1743	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig9	1744	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig9	2327	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig9	2392	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig9	2409	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2239	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2247	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2255	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2268	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2281	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2305	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2308	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2321	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2323	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2324	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2325	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2328	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2329	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig10	2330	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig11	547	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig11	608	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig11	610	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig11	632	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig11	641	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	443	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	457	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	458	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	459	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	480	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	511	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	514	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	545	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	564	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	565	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	573	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	574	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	588	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	604	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	620	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	628	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	639	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	640	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	644	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	649	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	650	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	652	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	654	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	677	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	684	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	690	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	705	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	722	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	750	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	751	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	757	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	767	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	803	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	804	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	808	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	817	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	826	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	834	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	843	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	851	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	855	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	862	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	869	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	881	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	891	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	898	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	899	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	901	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1055	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1094	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1114	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1142	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1143	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1144	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1163	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1164	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1173	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1179	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1203	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1204	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1207	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1217	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1218	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1228	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1243	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1264	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1270	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1272	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1289	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1304	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1322	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1325	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1329	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1333	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1335	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1341	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1393	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1394	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1406	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1425	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1430	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1434	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1436	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1441	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1452	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1458	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1460	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1462	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1466	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1474	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1485	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1486	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1487	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1488	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1500	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1502	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1504	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1505	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1517	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1518	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1519	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1523	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1559	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1569	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1570	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1578	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1612	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1613	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1615	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1618	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1622	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1623	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1635	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1636	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1638	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1663	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1671	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1672	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1673	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1674	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1696	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1700	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1701	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1709	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1716	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1724	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1726	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1727	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1728	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1738	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1743	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1744	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1745	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1751	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1752	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1753	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1754	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1756	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1765	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1768	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1769	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1780	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1782	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1783	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1784	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1800	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1805	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1821	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1829	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1831	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1841	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1842	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1845	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1849	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1858	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1860	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1869	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1870	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1877	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1890	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1896	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1897	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1903	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1904	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1916	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1926	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1940	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1947	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1949	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1952	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1953	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig12	1954	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	88	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	99	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	101	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	102	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	105	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	107	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	145	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	147	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	157	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	158	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	159	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	160	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	162	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	182	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	183	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	184	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	185	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	186	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	187	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	188	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	190	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	240	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	246	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	271	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	272	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	378	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	379	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	395	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	429	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	444	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	446	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	462	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	464	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	465	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	478	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	496	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	521	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	524	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	525	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	568	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	581	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	582	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	584	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	585	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	603	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	730	tie	3	1	1	1	0	0	S	33.3	reads split evenly, the bases equally far inside their reads
-Contig14	782	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	801	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	802	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	818	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	828	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	829	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	838	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	897	tie	4	2	0	2	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	968	indel	4	2	0	0	0	2	A	50.0	deletion in 2/4 reads
-Contig14	969	indel	4	0	0	2	0	2	G	50.0	deletion in 2/4 reads
-Contig14	994	indel	4	2	0	0	0	2	A	50.0	deletion in 2/4 reads
-Contig14	1004	indel	4	2	0	0	0	2	A	50.0	deletion in 2/4 reads
-Contig14	1069	tie	3	1	1	0	0	1	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1070	tie	3	0	1	1	0	1	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1071	tie	3	1	0	0	1	1	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1110	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1111	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1144	tie	3	1	0	1	1	0	K	33.3	reads split evenly, the bases equally far inside their reads
-Contig14	1147	tie	3	0	1	0	1	1	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1148	tie	3	1	0	1	0	1	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1165	tie	3	1	0	1	1	0	K	33.3	reads split evenly, the bases equally far inside their reads
-Contig14	1182	tie	3	0	0	1	1	1	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1183	tie	3	0	1	0	1	1	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1205	tie	3	1	0	1	0	1	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1228	tie	3	0	1	1	0	1	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1246	tie	3	1	0	1	0	1	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1252	tie	3	0	1	1	1	0	B	33.3	reads split evenly, the bases equally far inside their reads
-Contig14	1254	tie	3	1	1	0	1	0	H	33.3	reads split evenly, the bases equally far inside their reads
-Contig14	1315	tie	3	1	1	0	0	1	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1318	tie	3	1	1	0	0	1	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig14	1320	tie	3	1	1	1	0	0	V	33.3	reads split evenly, the bases equally far inside their reads
-Contig14	1464	indel	4	1	0	1	0	2	G	50.0	deletion in 2/4 reads
-Contig14	1618	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	140	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	145	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	146	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	201	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	251	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	285	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	297	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	298	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	327	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	334	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	342	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	343	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	344	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	371	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	372	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	374	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	397	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	408	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	409	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	485	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	488	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig15	491	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig17	361	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig17	405	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig17	455	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	671	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	714	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	811	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	813	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	814	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	824	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	828	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	933	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	936	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1002	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1003	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1021	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1111	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1181	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1190	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1268	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1269	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1270	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1271	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1272	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1293	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1309	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1354	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1355	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1410	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig18	1411	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig19	1081	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig19	1085	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig19	1110	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig19	1144	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	266	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	267	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	321	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	346	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	347	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	368	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	370	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	372	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	373	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	379	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	390	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	391	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	413	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	422	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	423	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	424	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	471	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	481	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	482	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	533	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	539	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	544	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	545	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	548	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	557	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	575	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	577	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	578	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	583	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	585	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	590	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	592	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	659	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	693	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	705	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	720	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	731	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	832	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	833	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	835	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	836	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	837	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	937	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	946	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	950	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	951	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	968	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	969	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	982	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	988	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	994	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	996	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	998	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1002	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1008	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1009	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1016	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1029	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1034	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1039	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1040	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1087	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1100	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1102	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1109	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1110	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1115	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1124	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1126	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1127	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1128	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1131	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1138	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1147	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1160	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1161	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1163	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1182	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1183	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1206	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1220	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1221	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig21	1243	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	670	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	672	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	680	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	709	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	711	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	712	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	730	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	768	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	774	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	816	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	818	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	837	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	838	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	855	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	881	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	896	tie	3	1	1	0	1	0	W	33.3	reads split evenly, the bases equally far inside their reads
-Contig22	904	tie	3	1	1	0	0	1	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	976	indel	4	0	0	2	0	2	G	50.0	deletion in 2/4 reads
-Contig22	1133	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	1134	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	1135	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	1136	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	1149	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig22	1159	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig25	163	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig25	164	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig25	188	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig25	190	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig25	191	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig25	192	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig25	235	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig26	316	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig26	404	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig27	457	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig27	458	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig27	459	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig27	461	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	321	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	324	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	329	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	352	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	362	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	398	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	401	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	439	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	440	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	441	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	442	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	455	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	497	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	499	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	532	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	538	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	604	tie	3	0	1	1	1	0	S	33.3	reads split evenly, the bases equally far inside their reads
-Contig28	655	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	711	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	715	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	716	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	719	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	720	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	721	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	722	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	723	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	740	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig28	748	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig29	631	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig29	632	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig30	138	tie	3	0	1	0	1	1	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig30	293	indel	5	0	0	0	3	2	T	40.0	deletion in 2/5 reads
-Contig31	469	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig31	564	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig31	565	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig31	639	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	62	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	64	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	86	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	87	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	88	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	131	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	133	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	370	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	394	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	396	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	400	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	640	tie	3	1	0	0	1	1	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig32	641	tie	3	1	1	0	0	1	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	98	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	111	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	150	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	182	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	185	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	207	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	224	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	226	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	230	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	241	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	247	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	253	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	259	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig33	266	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	181	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	183	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	226	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	233	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	237	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	251	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	291	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	292	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	323	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	328	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	339	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	340	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	370	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig35	371	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig36	294	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig36	296	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig36	328	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig36	330	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	476	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	477	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	478	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	479	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	480	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	542	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	619	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	620	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	621	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	660	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	688	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	773	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	784	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	785	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	792	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	803	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	807	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	823	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	824	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	827	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	848	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	849	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	851	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	852	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig8	897	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	562	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	564	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	566	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	571	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	617	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	623	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	624	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	625	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	626	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	636	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	645	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	646	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	647	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	654	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	692	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	693	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	695	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	697	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	698	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	699	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	700	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	705	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	707	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	724	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	725	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	727	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	731	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	733	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	766	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	767	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	768	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	852	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	853	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	855	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	883	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	889	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	916	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1018	tie	3	1	0	1	0	1	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1020	tie	3	1	1	1	0	0	V	33.3	reads split evenly, the bases equally far inside their reads
+Contig9	1172	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1242	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1246	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1252	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1259	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1263	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1265	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1266	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1267	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1268	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1278	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1282	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1290	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1291	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1292	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1293	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1294	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1295	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1297	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1307	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1311	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1342	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1343	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1344	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1345	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1360	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1361	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1362	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1367	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1377	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1393	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1398	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1407	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1453	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1464	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1498	tie	3	1	1	0	1	0	Y	33.3	reads split evenly, the bases equally far inside their reads
+Contig9	1715	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1717	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1718	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1726	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1729	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1731	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1735	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1736	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1741	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1746	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1748	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1749	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1752	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1754	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1757	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1759	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1760	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1773	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1775	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1776	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1777	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1779	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1781	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1786	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1788	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1789	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1793	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1795	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1796	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1797	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1798	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1800	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1802	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1808	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1810	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1812	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1815	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1817	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1818	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1830	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1834	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1836	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1839	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1840	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1842	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1843	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1844	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1847	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1848	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1849	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1852	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1861	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1871	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1872	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1879	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1880	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1883	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1893	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1895	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1902	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1904	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1908	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1909	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1910	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1911	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1915	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1922	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1923	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1926	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1927	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1928	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1931	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1932	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1934	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1935	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1939	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1946	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1949	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1950	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1963	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1964	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1966	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1971	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1972	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1973	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1974	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1976	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1978	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1979	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1981	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1984	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1995	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	1999	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2000	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2001	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2005	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2007	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2012	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2018	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2019	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2020	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2021	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2028	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2031	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2035	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2038	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2041	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2042	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2043	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2044	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2046	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2047	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2048	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2049	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2051	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2053	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2055	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2061	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2063	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2064	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2067	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2072	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2076	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2078	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2080	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2083	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2084	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2085	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2087	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2089	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2092	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2093	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2095	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2211	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2224	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2240	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2250	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2251	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2293	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2306	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2330	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2332	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2333	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2334	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2335	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2383	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2384	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2396	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2403	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2413	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2603	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2604	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2609	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2616	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2617	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2646	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2704	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig9	2706	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig10	1731	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig10	1733	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig10	1743	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig10	1744	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig10	2327	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig10	2392	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig10	2409	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2239	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2247	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2255	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2268	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2281	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2305	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2308	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2321	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2323	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2324	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2325	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2328	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2329	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig11	2330	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig12	547	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig12	608	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig12	610	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig12	632	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig12	641	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	443	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	457	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	458	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	459	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	480	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	511	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	514	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	545	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	564	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	565	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	573	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	574	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	588	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	604	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	620	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	628	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	639	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	640	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	644	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	649	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	650	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	652	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	654	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	677	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	684	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	690	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	705	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	722	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	750	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	751	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	757	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	767	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	803	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	804	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	808	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	817	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	826	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	834	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	843	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	851	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	855	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	862	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	869	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	881	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	891	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	898	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	899	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	901	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1055	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1094	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1114	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1142	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1143	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1144	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1163	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1164	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1173	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1179	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1203	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1204	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1207	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1217	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1218	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1228	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1243	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1264	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1270	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1272	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1289	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1304	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1322	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1325	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1329	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1333	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1335	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1341	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1393	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1394	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1406	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1425	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1430	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1434	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1436	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1441	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1452	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1458	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1460	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1462	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1466	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1474	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1485	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1486	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1487	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1488	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1500	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1502	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1504	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1505	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1517	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1518	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1519	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1523	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1559	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1569	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1570	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1578	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1612	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1613	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1615	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1618	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1622	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1623	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1635	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1636	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1638	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1663	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1671	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1672	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1673	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1674	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1696	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1700	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1701	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1709	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1716	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1724	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1726	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1727	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1728	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1738	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1743	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1744	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1745	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1751	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1752	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1753	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1754	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1756	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1765	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1768	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1769	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1780	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1782	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1783	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1784	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1800	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1805	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1821	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1829	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1831	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1841	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1842	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1845	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1849	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1858	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1860	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1869	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1870	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1877	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1890	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1896	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1897	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1903	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1904	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1916	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1926	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1940	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1947	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1949	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1952	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1953	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig13	1954	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	88	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	99	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	101	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	102	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	105	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	107	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	145	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	147	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	157	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	158	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	159	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	160	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	162	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	182	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	183	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	184	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	185	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	186	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	187	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	188	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	190	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	240	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	246	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	271	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	272	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	378	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	379	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	395	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	429	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	444	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	446	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	462	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	464	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	465	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	478	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	496	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	521	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	524	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	525	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	568	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	581	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	582	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	584	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	585	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	603	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	730	tie	3	1	1	1	0	0	S	33.3	reads split evenly, the bases equally far inside their reads
+Contig15	782	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	801	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	802	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	818	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	828	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	829	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	838	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	897	tie	4	2	0	2	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	968	indel	4	2	0	0	0	2	A	50.0	deletion in 2/4 reads
+Contig15	969	indel	4	0	0	2	0	2	G	50.0	deletion in 2/4 reads
+Contig15	994	indel	4	2	0	0	0	2	A	50.0	deletion in 2/4 reads
+Contig15	1004	indel	4	2	0	0	0	2	A	50.0	deletion in 2/4 reads
+Contig15	1069	tie	3	1	1	0	0	1	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1070	tie	3	0	1	1	0	1	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1071	tie	3	1	0	0	1	1	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1110	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1111	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1144	tie	3	1	0	1	1	0	K	33.3	reads split evenly, the bases equally far inside their reads
+Contig15	1147	tie	3	0	1	0	1	1	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1148	tie	3	1	0	1	0	1	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1165	tie	3	1	0	1	1	0	K	33.3	reads split evenly, the bases equally far inside their reads
+Contig15	1182	tie	3	0	0	1	1	1	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1183	tie	3	0	1	0	1	1	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1205	tie	3	1	0	1	0	1	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1228	tie	3	0	1	1	0	1	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1246	tie	3	1	0	1	0	1	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1252	tie	3	0	1	1	1	0	B	33.3	reads split evenly, the bases equally far inside their reads
+Contig15	1254	tie	3	1	1	0	1	0	H	33.3	reads split evenly, the bases equally far inside their reads
+Contig15	1315	tie	3	1	1	0	0	1	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1318	tie	3	1	1	0	0	1	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig15	1320	tie	3	1	1	1	0	0	V	33.3	reads split evenly, the bases equally far inside their reads
+Contig15	1464	indel	4	1	0	1	0	2	G	50.0	deletion in 2/4 reads
+Contig15	1618	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	140	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	145	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	146	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	201	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	251	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	285	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	297	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	298	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	327	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	334	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	342	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	343	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	344	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	371	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	372	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	374	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	397	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	408	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	409	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	485	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	488	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig16	491	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig18	361	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig18	405	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig18	455	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	671	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	714	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	811	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	813	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	814	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	824	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	828	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	933	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	936	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1002	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1003	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1021	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1111	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1181	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1190	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1268	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1269	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1270	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1271	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1272	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1293	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1309	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1354	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1355	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1410	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig19	1411	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig20	1081	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig20	1085	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig20	1110	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig20	1144	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	266	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	267	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	321	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	346	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	347	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	368	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	370	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	372	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	373	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	379	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	390	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	391	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	413	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	422	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	423	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	424	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	471	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	481	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	482	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	533	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	539	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	544	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	545	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	548	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	557	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	575	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	577	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	578	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	583	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	585	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	590	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	592	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	659	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	693	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	705	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	720	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	731	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	832	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	833	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	835	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	836	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	837	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	937	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	946	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	950	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	951	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	968	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	969	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	982	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	988	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	994	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	996	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	998	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1002	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1008	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1009	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1016	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1029	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1034	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1039	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1040	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1087	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1100	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1102	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1109	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1110	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1115	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1124	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1126	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1127	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1128	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1131	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1138	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1147	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1160	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1161	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1163	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1182	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1183	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1206	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1220	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1221	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig22	1243	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	670	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	672	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	680	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	709	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	711	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	712	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	730	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	768	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	774	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	816	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	818	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	837	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	838	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	855	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	881	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	896	tie	3	1	1	0	1	0	W	33.3	reads split evenly, the bases equally far inside their reads
+Contig23	904	tie	3	1	1	0	0	1	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	976	indel	4	0	0	2	0	2	G	50.0	deletion in 2/4 reads
+Contig23	1133	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	1134	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	1135	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	1136	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	1149	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig23	1159	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig26	163	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig26	164	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig26	188	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig26	190	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig26	191	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig26	192	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig26	235	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig27	316	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig27	404	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig28	457	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig28	458	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig28	459	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig28	461	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	321	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	324	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	329	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	352	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	362	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	398	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	401	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	439	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	440	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	441	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	442	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	455	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	497	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	499	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	532	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	538	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	604	tie	3	0	1	1	1	0	S	33.3	reads split evenly, the bases equally far inside their reads
+Contig29	655	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	711	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	715	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	716	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	719	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	720	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	721	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	722	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	723	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	740	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig29	748	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig30	631	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig30	632	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig31	138	tie	3	0	1	0	1	1	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig31	293	indel	5	0	0	0	3	2	T	40.0	deletion in 2/5 reads
+Contig32	469	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig32	564	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig32	565	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig32	639	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	62	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	64	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	86	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	87	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	88	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	131	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	133	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	370	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	394	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	396	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	400	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	640	tie	3	1	0	0	1	1	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig33	641	tie	3	1	1	0	0	1	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	98	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	111	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	150	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	182	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	185	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	207	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	224	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	226	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	230	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	241	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	247	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	253	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	259	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig34	266	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	181	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	183	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	226	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	233	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	237	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	251	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	291	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	292	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	323	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	328	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	339	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	340	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
 Contig36	370	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig36	371	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig36	372	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig36	376	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig36	399	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig37	504	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig37	532	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig37	592	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig38	258	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig38	284	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig38	287	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig38	291	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig38	295	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig38	387	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig38	410	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig38	411	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig39	239	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig39	249	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig39	257	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig39	527	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig39	530	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	206	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	208	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	209	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	252	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	263	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	270	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	271	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	289	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	314	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	321	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	323	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	324	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	337	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	405	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	406	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	407	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	421	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	422	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	459	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	460	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	493	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	501	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig40	502	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	166	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	167	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	190	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	191	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	194	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	200	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	222	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	257	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	277	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	299	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	301	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	318	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	319	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig36	371	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig37	294	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig37	296	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig37	328	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig37	330	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig37	370	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig37	371	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig37	372	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig37	376	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig37	399	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig38	504	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig38	532	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig38	592	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig39	258	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig39	284	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig39	287	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig39	291	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig39	295	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig39	387	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig39	410	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig39	411	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig40	239	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig40	249	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig40	257	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig40	527	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig40	530	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	206	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	208	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	209	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	252	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	263	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	270	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	271	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	289	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	314	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	321	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
 Contig41	323	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	335	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	394	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig41	446	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig42	210	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig42	233	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig42	237	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig42	238	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig42	239	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig44	310	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig44	311	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig44	314	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig44	321	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig44	322	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig44	323	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
-Contig44	336	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig44	390	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig45	288	tie	3	1	1	0	1	0	H	33.3	reads split evenly, the bases equally far inside their reads
-Contig46	64	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig46	65	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig46	124	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig46	130	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig46	144	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig46	162	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig46	163	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig46	164	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
-Contig46	166	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig46	186	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
-Contig46	188	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig46	268	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
-Contig47	75	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
-Contig47	89	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	324	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	337	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	405	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	406	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	407	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	421	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	422	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	459	tie	2	0	0	1	1	0	K	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	460	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	493	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	501	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig41	502	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	166	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	167	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	190	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	191	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	194	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	200	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	222	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	257	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	277	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	299	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	301	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	318	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	319	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	323	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	335	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	394	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig42	446	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig43	210	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig43	233	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig43	237	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig43	238	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig43	239	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig45	310	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig45	311	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig45	314	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig45	321	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig45	322	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig45	323	tie	2	0	1	1	0	0	S	50.0	reads split evenly, the bases equally far inside their reads
+Contig45	336	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig45	390	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig46	288	tie	3	1	1	0	1	0	H	33.3	reads split evenly, the bases equally far inside their reads
+Contig47	64	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig47	65	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig47	124	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig47	130	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig47	144	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig47	162	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig47	163	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig47	164	tie	2	1	1	0	0	0	M	50.0	reads split evenly, the bases equally far inside their reads
+Contig47	166	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig47	186	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
+Contig47	188	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig47	268	tie	2	1	0	1	0	0	R	50.0	reads split evenly, the bases equally far inside their reads
+Contig48	75	tie	2	1	0	0	1	0	W	50.0	reads split evenly, the bases equally far inside their reads
+Contig48	89	tie	2	0	1	0	1	0	Y	50.0	reads split evenly, the bases equally far inside their reads
 
 Overlaps that passed the filters
 --------------------------------
@@ -2250,12 +2279,11 @@ cd27fbaa-aad4-4f11-93c3-60820c90b1b4	8bb1fd73-41c4-4938-b525-ed66517089d6	-	-34	
 a512e3ab-a48a-459a-a991-a9c1088f4cb2	be0d125b-2696-4b51-b24e-706edc8ac231	-	613	854	90.8	1287	33	47	b_in_a	joining
 d1aa81d7-aaac-4e79-a30d-60f28bbfbabc	c948541a-8738-4b3b-8c7a-018392421646	+	-2865	1025	85.6	1227	106	45	a_in_b	joining
 7a602931-faf5-4c65-aea8-6e87d82479cb	e879febd-8a55-4f81-9418-3bdfed338329	+	-3	763	93.1	1226	18	35	a_in_b	joining
-b3351989-234b-4a03-b77d-3ccf6f8d6494	74ac4007-be0e-4c77-9ff5-8c8156b28bd5	+	47	984	85.8	1213	63	81		conflict
 88d98917-0165-4954-ad30-e9482879b6b7	c948541a-8738-4b3b-8c7a-018392421646	-	-286	956	85.8	1143	80	58	a_in_b	joining
 d2706abb-b6d5-4b1e-8927-5f2cc8d9f07b	b39b412d-157f-43b2-9448-3d2dce3c8f10	-	-411	762	87.3	974	68	30		joining
 1a14e714-92b6-424e-bc16-6ab65beef897	9426f312-982f-42ac-a818-c278d5ec4ff0	-	35	542	93.8	879	16	18	b_in_a	joining
 cd27fbaa-aad4-4f11-93c3-60820c90b1b4	4141201f-6d43-4979-af25-d25daa1a42e1	-	364	707	86.5	877	61	37		conflict
-555acb2c-e8f0-4719-ac89-3f01358e4e06	74ac4007-be0e-4c77-9ff5-8c8156b28bd5	+	415	534	90.0	789	26	28		conflict
+555acb2c-e8f0-4719-ac89-3f01358e4e06	74ac4007-be0e-4c77-9ff5-8c8156b28bd5	+	415	534	90.0	789	26	28		joining
 b39b412d-157f-43b2-9448-3d2dce3c8f10	06908f09-8444-477d-9764-870538fa942f	-	524	649	85.6	781	61	34		joining
 7e7504e7-4dae-441e-9476-5829acdd2455	75f1c5cb-28e0-4e82-b74a-106f4e423667	-	384	644	85.9	781	58	35		joining
 a4085e0f-b63f-4dd2-9e98-768b0a0c2329	3f26901d-b915-4acb-b693-c0a822e6512d	+	-29	618	85.0	738	57	37	b_in_a	joining
@@ -6852,6 +6880,7 @@ b3351989-234b-4a03-b77d-3ccf6f8d6494	0994d790-b92f-403f-8fae-c110cdb1b5b5	+			no
 b3351989-234b-4a03-b77d-3ccf6f8d6494	280008b8-d434-49bd-a09b-2e09506e8629	-			no alignment
 b3351989-234b-4a03-b77d-3ccf6f8d6494	53238ec0-47df-42e8-8fc4-c9adb5da11b1	+			no alignment
 b3351989-234b-4a03-b77d-3ccf6f8d6494	42833a76-8d4b-4a04-ab21-c14eb46db379	+			no alignment
+b3351989-234b-4a03-b77d-3ccf6f8d6494	74ac4007-be0e-4c77-9ff5-8c8156b28bd5	+	984	85.8	identity falls to 46% over 50 columns inside the overlap (< 50%) — the reads agree on either side of that stretch but not across it, as at a chimeric junction
 b3351989-234b-4a03-b77d-3ccf6f8d6494	32425eed-dfbc-43d0-b839-2f84db2d1fd7	+			no alignment
 6f7ab1fb-131d-4e80-9674-76db0ab3c103	d201e4c2-35a3-4bd1-8667-392ba3825893	-	112	72.8	identity too low (72.8% < 85%)
 6f7ab1fb-131d-4e80-9674-76db0ab3c103	4f6623bd-534c-471f-8180-0d49235543db	+			no alignment
@@ -10142,9 +10171,7 @@ These overlaps passed every filter but contradicted the layout already built fro
 ReadA	ReadB	Strand	Overlap(nt)	Identity(%)	Reason
 9c327cae-8403-4274-ab5c-6a7fd62190fc	91850e68-85e4-49db-8e67-ca6b5916941c	-	926	91.2	offset differs from the layout by 86 nt (> offsetTolerance 20)
 cd27fbaa-aad4-4f11-93c3-60820c90b1b4	4141201f-6d43-4979-af25-d25daa1a42e1	-	707	86.5	offset differs from the layout by 29 nt (> offsetTolerance 20)
-b3351989-234b-4a03-b77d-3ccf6f8d6494	74ac4007-be0e-4c77-9ff5-8c8156b28bd5	+	984	85.8	ambiguous extension — this end overlaps reads that do not overlap each other, the signature of a repeat boundary
 1fa3781d-9399-4698-a6cd-0377c6eece11	8bb1fd73-41c4-4938-b525-ed66517089d6	-	144	92.4	ambiguous extension — this end overlaps reads that do not overlap each other, the signature of a repeat boundary
-555acb2c-e8f0-4719-ac89-3f01358e4e06	74ac4007-be0e-4c77-9ff5-8c8156b28bd5	+	534	90.0	ambiguous extension — this end overlaps reads that do not overlap each other, the signature of a repeat boundary
 6dfd56ba-dd39-487b-831f-7366fb0b344b	2529d593-191f-4c56-8109-dcbad4ce4b27	+	273	88.7	ambiguous extension — this end overlaps reads that do not overlap each other, the signature of a repeat boundary
 6dfd56ba-dd39-487b-831f-7366fb0b344b	b0783147-9d04-49ca-828f-77ad974dde94	+	271	91.3	ambiguous extension — this end overlaps reads that do not overlap each other, the signature of a repeat boundary
 8bb1fd73-41c4-4938-b525-ed66517089d6	4f78526d-a592-473d-9e25-43dee6726db9	-	268	87.0	ambiguous extension — this end overlaps reads that do not overlap each other, the signature of a repeat boundary
@@ -10551,7 +10578,6 @@ c49715ab-fbe4-4047-8c8a-87dc213b145d	6836	46.7	0
 d9b4e880-8694-403f-a802-343196f4aa6d	379	37.5	0
 61110659-0a08-4fa3-a888-faee8b6cbfc7	386	31.9	0
 3d3a3a9c-53c6-44e8-ac27-9e4fdb2d42b5	341	35.5	0
-555acb2c-e8f0-4719-ac89-3f01358e4e06	949	55.1	0
 5f12e645-bb8a-4dce-b75e-e61cd6d10113	257	34.2	0
 22bfbd22-4b01-41c6-a7b8-daae55c1f27f	691	33.7	0
 1f9866ba-6c88-4fde-b717-1270d3c5fcaf	2559	48.0	0
@@ -10915,7 +10941,6 @@ ac93f60d-e8c7-4f4e-885b-aaac14c22e9b	424	35.4	0
 1b8650a7-931f-455c-b8b6-437799fa9ab6	644	39.9	0
 4ca00602-05d6-42eb-b70a-d0153ed53f29	380	47.4	0
 abaa13f8-5024-46f6-97d1-a3c5ee81034f	266	39.8	0
-74ac4007-be0e-4c77-9ff5-8c8156b28bd5	3200	53.7	0
 280f6108-8054-402f-bf03-93c2a6662bc1	1877	34.9	0
 154f1dd0-6571-47ca-92db-e9905b1ae2d1	685	36.1	0
 e45af985-3f8d-480e-bcab-83c07af34f8e	226	42.9	0

@@ -1,11 +1,11 @@
 === OLC Assembler ===
 
 Reads used:        1000
-Placed / singleton: 128 / 872
-Contigs:           47  (longest 11858 bp, N50 4062 bp)
-Consensus total:   106921 bp
+Placed / singleton: 130 / 870
+Contigs:           48  (longest 11858 bp, N50 4062 bp)
+Consensus total:   110560 bp
 Mean coverage:     1.5×
-Polymorphic sites: 0 SNP, 17 indel, 2005 unresolved tie(s)
+Polymorphic sites: 0 SNP, 17 indel, 2030 unresolved tie(s)
 
 === Overlap stage ===
 
@@ -13,19 +13,19 @@ k-mer words indexed: 970229
 Seed hits:           265694
 Repeat words skipped: 4  (seen more than 100 times)
 Candidate pairs:     7888
-Accepted overlaps:   103
-Rejected overlaps:   7785
-Layout conflicts:    10
+Accepted overlaps:   102
+Rejected overlaps:   7786
+Layout conflicts:    8
 
 === Error model ===
 
 Sequencing error rate: 3.33%  (measured from the mismatches in this run's own overlaps)
-Polymorphism cut-off:  p < 9.33e-6  (auto: about one false call per assembly)
+Polymorphism cut-off:  p < 9.02e-6  (auto: about one false call per assembly)
 Repeat cut-off:        word copy number ≥ 4  (1.8× the median)
 
 === Performance ===
 
-Elapsed: 9.21 s
+Elapsed: 12.62 s
 Threads: 3 (worker threads)
 
 === Notices ===
