@@ -52,9 +52,21 @@ Oxford Nanopore R9/R10 reads of PCR products. The stages are those of CAP3:
    end of the alignment. Two further guards refuse overlaps that lie almost entirely inside repeated
    sequence (measured by word counts across the input) and joins across a repeat proven by
    divergence (two reads that align and then go separate ways, each way confirmed by other reads).
-4. **Chimera detection.** A read whose two halves overlap different sets of reads, with no read
-   spanning the junction, carries two molecules (two products ligated end to end, a fold-back read,
-   or two molecules read through one adapter). Such reads are set aside and listed in the report.
+4. **Chimera detection.** Three checks. Before seeding, a read whose end is the reverse complement
+   of sequence earlier in the same read — a fold-back read, the strand read on into its own
+   complement — has the duplicated stretch cut away (the copy must be at least 50 nt long and reach
+   an end of the read; a hairpin keeps its longer arm, copies that lie apart keep only what lies
+   between them) and is listed in the report; left whole, its tail is laid beyond the end of the
+   product and written into the consensus. At overlap acceptance, an alignment whose identity falls
+   over any 50 columns to 35 points below `--min-identity` is refused as running across a chimeric
+   junction: two reads that each join the same two products agree on either side of the stretch
+   between their junctions and not across it, however high the identity of the whole alignment.
+   After the overlaps, a read carries two molecules (two products ligated end to end, or two
+   molecules read through one adapter) when, at one point inside it, the reads overlapping one part
+   stop and those overlapping the other part start, or when the reads that align with it part from
+   it there — they agree with it up to that point and then go on with sequence of their own, so the
+   overhang filter refused the overlap — and almost none run across; such reads are set aside and
+   listed in the report with the pattern seen. `--no-chimera-check` turns all three off.
 5. **Greedy layout.** Accepted overlaps are taken in order of score and chained into contigs; an
    overlap that contradicts the layout built so far is recorded as a layout conflict, and a read end
    that overlaps several reads which do not overlap each other stops the contig rather than guessing.
@@ -66,7 +78,12 @@ Oxford Nanopore R9/R10 reads of PCR products. The stages are those of CAP3:
    and passes a binomial test against the sequencing error rate measured from the data itself. An
    evenly split column is a tie; it goes to the base that lies further inside its read, because read
    ends carry the poorest base calls and, in PCR products, the primer. Indel polymorphisms are listed
-   in the report and the consensus takes the majority.
+   in the report and the consensus takes the majority. A contig end carried by fewer than three
+   reads, or by fewer than 5 % of the contig's median coverage, over more than `--max-overhang`
+   bases is cut back to the last well-supported column (`--set minEndCov=0` keeps it); the bases
+   cut from each end are given per contig in the report. A contig whose own median coverage is
+   under twice that threshold is left alone: at one or two reads of coverage every end is carried
+   by one read.
 
 The design is explained stage by stage in the comments of `js/cap.js`, and the parameters are
 documented, with the reasoning behind each default, in `CAP_DEFAULTS` at the top of that file.
@@ -183,7 +200,8 @@ Assembly
   --end-trim N          Bases clipped from both ends of every read (default 0).
   --end-penalty N       End-gap penalty (default 0).
   --no-rc               Do not consider reverse-complement overlaps.
-  --no-chimera-check    Keep reads that look like two molecules joined in one read.
+  --no-chimera-check    Keep reads that look like two molecules joined in one read: no
+                        fold-back trimming, no junction test, no chimeras set aside.
   --no-repeat-guard     Do not refuse joins across a repeat proven by divergence.
   --no-singletons       Leave unassembled reads out of the FASTA.
   --set KEY=VALUE       Any other engine parameter by name (repeatable), e.g. --set minSeeds=2.
@@ -209,7 +227,7 @@ For `--out runs/sample1` and a group named `79`:
 | File | Content |
 |---|---|
 | `runs/sample1.79.contigs.fasta` | The consensus sequences, upper case, one record per contig. The header carries `length`, `reads`, `cov` (mean coverage), `snp` and `indel` (polymorphic sites called) and `tie` (evenly split columns, carried as IUPAC codes). Unassembled reads follow, marked as singletons, unless `--no-singletons`. |
-| `runs/sample1.79.report.txt` | The assembly report: a run summary (reads used, placed, singletons, contigs, total consensus, longest contig, N50, mean coverage, candidate pairs, overlaps accepted and rejected, layout conflicts, polymorphic sites, elapsed time and threads), the parameters used, then tab-separated tables: one row per contig; one per read placement (contig, read, strand, start, end, length, clipped bases); one per polymorphic site or tie (position, coverage, counts of A, C, G, T and gap, the IUPAC code, minor-allele fraction); one per accepted overlap (reads, strand, offset, length, identity, score, mismatches, gaps, containment and whether it joined, confirmed or conflicted with the layout); one per rejected overlap with its reason; one per layout conflict; and the singletons with their length, GC content and repeat-word hits. The tables paste straight into a spreadsheet. |
+| `runs/sample1.79.report.txt` | The assembly report: a run summary (reads used, placed, singletons, chimeric and fold-back reads, contigs, total consensus, longest contig, N50, mean coverage, candidate pairs, overlaps accepted and rejected, layout conflicts, polymorphic sites, contig ends trimmed, elapsed time and threads), the parameters used, then tab-separated tables: one row per contig (length, reads, coverage, variants, strands, bases trimmed from each end); one per read placement (contig, read, strand, start, end, length, clipped bases); one per polymorphic site or tie (position, coverage, counts of A, C, G, T and gap, the IUPAC code, minor-allele fraction); one per accepted overlap (reads, strand, offset, length, identity, score, mismatches, gaps, containment and whether it joined, confirmed or conflicted with the layout); one per rejected overlap with its reason; one per layout conflict; the singletons with their length, GC content and repeat-word hits; the chimeric reads with their junctions; and the fold-back reads with their two copies and the part kept. The tables paste straight into a spreadsheet. |
 | `runs/sample1.79.log.txt` | The short log: input, seeding statistics, the measured error rate, threads used and any notices. |
 | `runs/sample1.79.placements.tsv` | With `--placements`: the read placement table alone, for downstream scripts. |
 | `runs/sample1.79.alignment.txt` | With `--alignment`: every read under its contig's consensus, a dot where the read agrees, `-` for a gap, the strand after the read name and `*` over polymorphic columns. |
@@ -240,6 +258,18 @@ divergent means `--min-identity` is above what the reads can reach.
   except at homopolymer runs: none or one base in 2 kb for R10, up to about ten for R9, where most
   reads under-call the run length in the same way, a limit of the chemistry that no vote repairs.
   Check the alignment at homopolymer runs.
+- **Chimeric reads.** A few percent of the reads of a PCR library carry two molecules. Fold-back
+  reads have their duplicated stretch cut away, overlaps across a junction are refused and ligation
+  chimeras are set aside, so the products come out at their own length; the run summary counts
+  each kind. Measured on two 2 kb products at 200 reads with 1, 5 and 10 % chimeric reads (half of
+  them fold-backs, three replicates each): on R10-like reads every product came out exact and at
+  its own length, on R9-like reads at its own length with the homopolymer floor above (0.20–0.23 %),
+  and every fold-back and ligation chimera was listed. The engine before these checks had
+  extended the contigs by the fold-back tails and built contigs out of the ligation chimeras. One
+  caveat: a product whose two ends are inverted repeats of each other over 50 nt or more
+  (mirrored primer sites, terminal inverted repeats) looks like a fold-back in every full-length
+  read, and each read would be cut to its middle; turn the trimming off for such a product with
+  `--set foldbackMin=0` (the report then says "fold-back copies off").
 - **Pooled libraries.** When one barcode holds many different products, each at low depth, most
   reads stay singletons whatever the settings, because no second read of the same product is in the
   sample; the number of contigs and the singleton count in `bins.tsv` say so at a glance. Raising
