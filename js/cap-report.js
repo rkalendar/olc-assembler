@@ -108,6 +108,9 @@
         row('Reads placed in contigs', S.readsPlaced);
         row('Singletons (unassembled)', S.singletons);
         if (S.chimeras) row('Chimeric reads (set aside)', S.chimeras);
+        if (S.foldbacks || S.foldbacksDropped) {
+            row('Fold-back reads trimmed', S.foldbacks + (S.foldbacksDropped ? ' (and ' + S.foldbacksDropped + ' dropped)' : ''));
+        }
         row('Contigs', S.contigs);
         row('Total consensus', S.totalBp + ' bp');
         row('Longest contig', S.longest + ' bp');
@@ -120,6 +123,7 @@
         row('Polymorphic sites (SNP)', S.snps);
         row('Indel polymorphisms', S.indels);
         if (S.ties) row('Unresolved ties (IUPAC)', S.ties);
+        if (S.trimmedBp) row('Contig ends trimmed', S.trimmedBp + ' bp');
         row('Elapsed', (S.elapsedMs / 1000).toFixed(2) + ' s' +
                        (S.threads > 1 ? ' on ' + S.threads + ' worker threads' : ' on 1 thread'));
         L.push('');
@@ -135,6 +139,9 @@
                (P.qualWeight ? ' · votes weighted by PHRED quality when supplied' : ''));
         L.push('reverse-complement search: ' + (P.allowRC ? 'on' : 'off') +
                ' · chimeric reads: ' + (P.chimeraCheck ? 'set aside' : 'kept') +
+               (P.chimeraCheck ? ' (fold-back copies ' + (P.foldbackMin > 0 ? '≥ ' + P.foldbackMin + ' nt trimmed' : 'off') +
+                                 (S.junctionIdentity ? ', junctions below ' + S.junctionIdentity + '% local identity refused' : '') + ')' : '') +
+               ' · contig ends need ' + (P.minEndCov > 0 ? '≥ ' + P.minEndCov + ' reads (or 5% of the median coverage) in contigs at least twice that deep' : 'no minimum coverage') +
                ' · min read length ' + P.minReadLen + ' nt' +
                (P.endTrim ? ' · end trim ' + P.endTrim + ' nt' : '') +
                (P.qualClip ? ' · quality clip < Q' + P.qualClip : ''));
@@ -142,7 +149,9 @@
 
         L.push('Contigs');
         L.push('-------');
-        L.push(['Contig', 'Length(bp)', 'Reads', 'MeanCoverage', 'MinCoverage', 'SNP', 'Indel', 'Forward', 'Reverse'].join('\t'));
+        L.push('Trimmed5 and Trimmed3 are consensus bases cut from the two ends because too few reads carried them.');
+        L.push(['Contig', 'Length(bp)', 'Reads', 'MeanCoverage', 'MinCoverage', 'SNP', 'Indel', 'Forward', 'Reverse',
+                'Trimmed5', 'Trimmed3'].join('\t'));
         res.contigs.forEach(function (c) {
             var minCov = Infinity, fwd = 0, rev = 0;
             c.columns.forEach(function (col) { if (col.pos >= 0 && col.coverage < minCov) minCov = col.coverage; });
@@ -151,7 +160,7 @@
                     isFinite(minCov) ? minCov : 0,
                     c.variants.filter(function (v) { return v.kind === 'snp'; }).length,
                     c.variants.filter(function (v) { return v.kind === 'indel'; }).length,
-                    fwd, rev].join('\t'));
+                    fwd, rev, c.trimmed ? c.trimmed[0] : 0, c.trimmed ? c.trimmed[1] : 0].join('\t'));
         });
         L.push('');
 
@@ -271,11 +280,33 @@
             L.push('--------------');
             L.push('Reads that carry two molecules: the reads overlapping one part stop at the junction, ' +
                    'those overlapping the other start there, and almost none run across it. They were ' +
-                   'left out of the layout and out of the FASTA. Junction = position on the read as given.');
-            L.push(['Read', 'Length(nt)', 'Junction(nt)', 'ReadsEnding', 'ReadsStarting', 'ReadsAcross'].join('\t'));
+                   'left out of the layout and out of the FASTA. Junction = position on the read as given. ' +
+                   'Evidence "piles": the overlapping reads end and begin there. Evidence "parting": the ' +
+                   'partners agree with the read up to (or from) there and then go on with sequence of ' +
+                   'their own, and nothing vouches for the read across it; ReadsEnding and ReadsStarting ' +
+                   'then count those partners.');
+            L.push(['Read', 'Length(nt)', 'Junction(nt)', 'ReadsEnding', 'ReadsStarting', 'ReadsAcross', 'Evidence'].join('\t'));
             res.chimeras.forEach(function (c) {
                 var r = reads[c.read];
-                L.push([r.id, r.len, c.to > c.at ? c.at + '-' + c.to : c.at, c.ending, c.starting, c.spanning].join('\t'));
+                L.push([r.id, r.len, c.to > c.at ? c.at + '-' + c.to : c.at, c.ending, c.starting, c.spanning,
+                        c.evidence || 'piles'].join('\t'));
+            });
+            L.push('');
+        }
+
+        if (res.foldbacks && res.foldbacks.length) {
+            L.push('Fold-back reads');
+            L.push('---------------');
+            L.push('Reads that carry a stretch of their own sequence twice, the second time reverse-complemented: ' +
+                   'the strand was read on into its complement. Each had the duplicated stretch cut away before ' +
+                   'assembly (Kept, on the read as given; the rest counts as clipped in the placement table), or ' +
+                   'was dropped when nothing long enough remained. A hairpin keeps its longer arm; copies that lie ' +
+                   'apart keep only what lies between them, since either copy may be the one the strand re-read. ' +
+                   'Copy1 and Copy2 are the two copies on the read, 1-based.');
+            L.push(['Read', 'Length(nt)', 'Copy1', 'Copy2', 'Identity(%)', 'Kept', 'Action'].join('\t'));
+            res.foldbacks.forEach(function (f) {
+                L.push([f.id, f.len, (f.copies[0] + 1) + '-' + f.copies[1], (f.copies[2] + 1) + '-' + f.copies[3],
+                        pct(f.identity), f.kept ? (f.kept[0] + 1) + '-' + f.kept[1] : '-', f.action].join('\t'));
             });
             L.push('');
         }
@@ -585,8 +616,11 @@
         L.push('Reads used:        ' + S.readsIn);
         L.push('Placed / singleton:' + ' ' + S.readsPlaced + ' / ' + S.singletons +
                (S.chimeras ? '  (' + S.chimeras + ' chimeric read(s) set aside)' : ''));
+        if (S.foldbacks || S.foldbacksDropped) {
+            L.push('Fold-back reads:   ' + S.foldbacks + ' trimmed' + (S.foldbacksDropped ? ', ' + S.foldbacksDropped + ' dropped' : ''));
+        }
         L.push('Contigs:           ' + S.contigs + '  (longest ' + S.longest + ' bp, N50 ' + S.n50 + ' bp)');
-        L.push('Consensus total:   ' + S.totalBp + ' bp');
+        L.push('Consensus total:   ' + S.totalBp + ' bp' + (S.trimmedBp ? '  (' + S.trimmedBp + ' bp of thinly covered contig ends trimmed)' : ''));
         L.push('Mean coverage:     ' + pct(S.meanCoverage) + '×');
         L.push('Polymorphic sites: ' + S.snps + ' SNP, ' + S.indels + ' indel' +
                (S.ties ? ', ' + S.ties + ' unresolved tie(s)' : ''));

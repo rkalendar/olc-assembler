@@ -93,7 +93,38 @@ var CAP_DEFAULTS = {
     offsetTolerance: 20, // an overlap disagreeing with the layout by more than this
                          // many bases is a conflict, not a join
     allowRC: true,       // consider reverse-complemented reads
-    chimeraCheck: true,  // set aside reads that carry two molecules (capChimeras)
+    chimeraCheck: true,  // set aside reads that carry two molecules (capChimeras, capPartingChimeras),
+                         // trim fold-back reads (capFoldbacks) and refuse overlaps
+                         // that run across a chimeric junction (capOverlapPair)
+    // A read whose last (or first) bases are the reverse complement of sequence
+    // elsewhere in the same read is a fold-back read. The copy must be at least
+    // this long; a shorter one is left to the overhang filter and to the
+    // contig-end trim, which between them contain the damage a short tail can do.
+    // 0 = off. Measured on two 2000 nt products with 1-10 % chimeric reads: the
+    // tails were 600-1400 nt and every one was found; see capFoldbacks.
+    foldbackMin: 50,
+    // Local identity, percent over CAP_JUNCTION_WINDOW (50) aligned columns,
+    // below which an overlap is refused as running across a chimeric junction
+    // even when its overall identity passes. 0 = minIdentity − 35, not below
+    // 40. Measured: in 32,722 genuine overlaps between R9-level reads (7 %
+    // error each, minIdentity 85) the worst 50-column window of an overlap was
+    // 54 % once and under 60 % in one overlap per thousand; between R10-level
+    // reads (minIdentity 90) it never went under 72 %. Between two chimeras of
+    // the same two products the stretch between their junctions aligned at
+    // 32-47 %. Real reads carry noisier stretches than the model: on the
+    // bundled R9.4.1 run (minIdentity 85) three accepted overlaps of 427-1151
+    // nt had a worst window of 52-54 % and one of 46 %, so the margin is 35
+    // points rather than the 30 the model would allow.
+    junctionIdentity: 0,
+    // A contig end carried by fewer reads than this — or than 5 % of the
+    // contig's median coverage, whichever is larger — over more than maxOverhang
+    // bases is cut back to the last well-supported column: it is one or two
+    // reads' unmatched tail, not the product. The maxOverhang tolerance leaves
+    // the natural taper of read ends alone (reads of one product end within a
+    // few bases of one another, and the last base may be carried by few of
+    // them), and a contig whose own median coverage is under twice the
+    // threshold is left alone (see capTrimEnds). 0 = off.
+    minEndCov: 3,
     repeatGuard: true,   // stop a contig at a repeat boundary rather than guessing
                          // which copy continues (see capBranchGuard)
     // These two defaults are measured, not guessed. On a 30 kb target carrying a
@@ -175,6 +206,9 @@ function capParams(p) {
     num('polyMinCov', 1, 1000);
     num('endPenalty', 0, 200);
     num('polyMaxP', 0, 1);
+    num('foldbackMin', 0, 100000);
+    num('junctionIdentity', 0, 100);
+    num('minEndCov', 0, 100000);
 
     q.kmer = Math.round(q.kmer);
     q.minSeeds = Math.round(q.minSeeds);
@@ -474,6 +508,25 @@ function capSubTable(P) {
 // stage makes. Allocating a fresh traceback matrix per pair would dominate the
 // runtime and thrash the GC.
 var CAP_TB = null, CAP_TB_SIZE = 0;
+// Per-column match flags of the traceback, for the local-identity window of
+// the junction test (capOverlapPair). Same grow-only discipline as CAP_TB.
+var CAP_MF = null, CAP_MF_SIZE = 0;
+function capMatchBuf(need) {
+    if (CAP_MF_SIZE < need) {
+        var buf = new Uint8Array(need);
+        CAP_MF = buf;
+        CAP_MF_SIZE = need;
+    }
+    return CAP_MF;
+}
+// Width, in aligned columns, of the window over which local identity is judged.
+// An unrelated stretch this long inside an otherwise good alignment is a
+// chimeric junction; the sequencing error of two reads does not produce it
+// (see junctionIdentity in CAP_DEFAULTS for the measurements). Narrower than
+// 100 so that two chimeras whose junctions lie 30-50 nt apart are still told
+// apart; wider than 30 so that a run of errors in a homopolymer-rich stretch
+// of two R9 reads is not.
+var CAP_JUNCTION_WINDOW = 50;
 function capTraceBuf(need) {
     if (CAP_TB_SIZE < need) {
         // Record the new size only AFTER the allocation succeeds. A very wide band
@@ -503,9 +556,12 @@ function capTraceBuf(need) {
  * @returns {object|null} alignment, or null when nothing scores above zero
  *   {score, sStart, sEnd, tStart, tEnd, matches, mismatches, gaps, gapRuns,
  *    cols, identity, ops, edgeTouched,
- *    coreSStart, coreSEnd, coreTStart, coreTEnd, coreScore, coreIdentity}
+ *    coreSStart, coreSEnd, coreTStart, coreTEnd, coreScore, coreIdentity,
+ *    coreMinWindow}
  *   The core* fields describe the maximal-scoring segment of the alignment
- *   (see the traceback), which is what the overhang test is measured on.
+ *   (see the traceback), which is what the overhang test is measured on;
+ *   coreMinWindow is the lowest identity of any CAP_JUNCTION_WINDOW consecutive
+ *   columns inside it (the core's own identity when it is shorter than that).
  *   ops uses the CIGAR convention, read from s's point of view:
  *     'M' aligned pair, 'I' s has a base t lacks, 'D' t has a base s lacks.
  *   It covers [sStart,sEnd) × [tStart,tEnd) only; the free end gaps are not
@@ -600,9 +656,12 @@ function capAlignBanded(s, t, k0, w, P, wantOps) {
     // the end, `run` is the score of the path from the current boundary to the
     // end and `minRun` the lowest such suffix score seen so far, so
     // run − minRun is the best segment that starts here (Kadane's method).
-    var run = 0, minRun = 0, minI = bestI, minJ = bestJ, minM = 0, minX = 0, minG = 0;
+    var run = 0, minRun = 0, minI = bestI, minJ = bestJ, minM = 0, minX = 0, minG = 0, minCols = 0;
     var coreScore = CAP_NEG, coreSStart = bestI, coreSEnd = bestI, coreTStart = bestJ, coreTEnd = bestJ;
-    var coreMatches = 0, coreMismatches = 0, coreGaps = 0, step;
+    var coreMatches = 0, coreMismatches = 0, coreGaps = 0, coreColLo = 0, coreColHi = 0, step;
+    // One flag per column, in traceback order (mf[0] is the alignment's last
+    // column), read back below for the local-identity window of the core.
+    var mf = capMatchBuf(n + m + 1);
     while (ci > 0 && cj > 0) {
         var co = cj - (ci + k0 - w);
         if (co <= 0 || co >= W - 1) edge = true;
@@ -610,7 +669,7 @@ function capAlignBanded(s, t, k0, w, P, wantOps) {
         if (cst === 0) {
             var a = s.charAt(ci - 1), b = t.charAt(cj - 1);
             var ba = CAP_BITS[a], bb = CAP_BITS[b];
-            if (ba & bb) matches++; else mismatches++;
+            if (ba & bb) { matches++; mf[cols] = 1; } else { mismatches++; mf[cols] = 0; }
             if (ops) ops.push('M');
             cols++; lastGap = 0;
             step = sub[a.charCodeAt(0) * 128 + b.charCodeAt(0)];
@@ -618,14 +677,14 @@ function capAlignBanded(s, t, k0, w, P, wantOps) {
             ci--; cj--;
         } else if (cst === 1) {
             if (ops) ops.push('I');           // s consumed, t gapped: insertion in s
-            gaps++; cols++; if (lastGap !== 1) gapRuns++;
+            gaps++; mf[cols] = 0; cols++; if (lastGap !== 1) gapRuns++;
             lastGap = 1;
             cst = (d & 4) ? 1 : 0;
             step = cst === 1 ? ge : go;       // the run's first base pays the opening cost
             ci--;
         } else {
             if (ops) ops.push('D');           // t consumed, s gapped: deletion in s
-            gaps++; cols++; if (lastGap !== 2) gapRuns++;
+            gaps++; mf[cols] = 0; cols++; if (lastGap !== 2) gapRuns++;
             lastGap = 2;
             cst = (d & 16) ? 2 : 0;
             step = cst === 2 ? ge : go;
@@ -640,13 +699,29 @@ function capAlignBanded(s, t, k0, w, P, wantOps) {
             coreScore = run - minRun;
             coreSStart = ci; coreTStart = cj; coreSEnd = minI; coreTEnd = minJ;
             coreMatches = matches - minM; coreMismatches = mismatches - minX; coreGaps = gaps - minG;
+            coreColLo = minCols; coreColHi = cols;
         }
-        if (run < minRun) { minRun = run; minI = ci; minJ = cj; minM = matches; minX = mismatches; minG = gaps; }
+        if (run < minRun) { minRun = run; minI = ci; minJ = cj; minM = matches; minX = mismatches; minG = gaps; minCols = cols; }
     }
 
     if (ops) ops.reverse();
     var denom = matches + mismatches + gaps;
     var coreDenom = coreMatches + coreMismatches + coreGaps;
+    // The worst CAP_JUNCTION_WINDOW consecutive columns of the core. A chimeric
+    // junction is a stretch where the two reads are unrelated, so the identity
+    // there falls to what random sequence gives (about half), however good the
+    // flanks on either side are and however high the overall identity therefore
+    // stays. The flanks are what Kadane's segment keeps the stretch inside of:
+    // the segment drops a bad stretch only at its ends, never in its middle.
+    var minWin = -1;
+    if (coreColHi - coreColLo >= CAP_JUNCTION_WINDOW) {
+        var wsum = 0;
+        for (var wc = coreColLo; wc < coreColHi; wc++) {
+            wsum += mf[wc];
+            if (wc - coreColLo >= CAP_JUNCTION_WINDOW) wsum -= mf[wc - CAP_JUNCTION_WINDOW];
+            if (wc - coreColLo >= CAP_JUNCTION_WINDOW - 1 && (minWin < 0 || wsum < minWin)) minWin = wsum;
+        }
+    }
     return {
         score: bestScore,
         sStart: ci, sEnd: bestI,
@@ -661,7 +736,9 @@ function capAlignBanded(s, t, k0, w, P, wantOps) {
         coreSStart: coreSStart, coreSEnd: coreSEnd,
         coreTStart: coreTStart, coreTEnd: coreTEnd,
         coreScore: coreScore,
-        coreIdentity: coreDenom ? (100 * coreMatches / coreDenom) : 0
+        coreIdentity: coreDenom ? (100 * coreMatches / coreDenom) : 0,
+        coreMinWindow: minWin >= 0 ? (100 * minWin / CAP_JUNCTION_WINDOW)
+                                   : (coreDenom ? (100 * coreMatches / coreDenom) : 0)
     };
 }
 
@@ -694,6 +771,232 @@ function capAlignAuto(s, t, k0, P, wantOps, gate) {
         res = capAlignBanded(s, t, k0, P.maxBandWidth, P, wantOps);
     }
     return res;
+}
+
+/* ───────────────────────── 3b. Fold-back reads ───────────────────────────── */
+
+/* A fold-back read carries a stretch of its own template twice, the second time
+   reverse-complemented: the strand turns at a hairpin and is read back, or the
+   complementary strand follows the template strand through the pore. The
+   pile-based test in capChimeras() cannot see it. The read's body overlaps
+   every sibling, and the tail dents the identity of those overlaps too little
+   to fail them, so the read is accepted whole and its tail is laid beyond the
+   end of the product; two such tails of different length disagree with each
+   other there and the disagreement is written out as ambiguity codes. A 2000 nt
+   product came out as a 3068 nt contig with 217 IUPAC columns from two such
+   reads among 200.
+
+   The signature is inside the read. A word of the copy is the reverse
+   complement of a word of the original, and for every such pair of words the
+   two positions add up to the same number (the net indels between the copies
+   move it by a few). So each read's words are looked up against their own
+   reverse complements, the pairs are bucketed by that sum, and the strongest
+   bucket is confirmed with the banded aligner between the read and its reverse
+   complement — the same test an overlap between two reads has to pass. The
+   confirmed alignment gives the two copies as intervals on the read, mirror
+   images of each other. Then:
+     • the copies lie next to each other, or overlap (a hairpin, or two
+       molecules back to back with at most an adapter's length between them):
+       the read is cut between them, or at the fold, and the longer side kept;
+     • they lie apart (the tail copies the start of the read rather than its
+       end): either copy may be the one that continues the sequence between
+       them, so only that middle part is kept;
+     • what would be kept is shorter than minReadLen: the read is dropped.
+   The copy must reach a read end within maxOverhang bases. A template that
+   itself holds an inverted repeat shows the same words in every read, but
+   inside the read, with sequence going on after the second copy; only a read
+   that ends within the repeat looks like a fold-back, and such a read is cut
+   back to the start of the second copy, which the other reads still cover.
+
+   Runs before seeding, so the index, the overlaps and the layout only ever
+   see the trimmed read. The bases cut off count as clipped in the placement
+   table; a dropped read is listed with its name. Returns
+   [{idx, id, len, copies:[e0,e1,l0,l1], kept:[from,to], identity, action}],
+   coordinates 0-based half-open on the read as given, idx −1 when dropped. */
+var CAP_FOLD_BIN = 32;      // bucket width for the position sums, as DIAGBIN in seeding
+var CAP_FOLD_LOOP = 100;    // copies this close are one fold (an adapter can sit between them)
+var CAP_FOLD_JUNK = 60;     // a stretch scoring this far below its surroundings parts two copies
+
+/* The aligned copy, from the alignment of a read against its reverse complement.
+ *
+ * When the tail copies the start of the read, the copy and the original both lie
+ * on one diagonal of that alignment, with the rest of the read between them —
+ * sequence aligned against its own reverse complement, which matches nothing.
+ * The maximal-scoring segment takes both copies and the stretch between them
+ * together whenever the stretch costs less than a copy scores, so it cannot
+ * be read as one copy. The stretch is found as the lowest-scoring part of the
+ * segment (Kadane's method for the minimum), and when it scores CAP_FOLD_JUNK
+ * below its surroundings the segment is cut there and the part before it is
+ * the copy. A hairpin's arms align in one piece, with at most the loop as a
+ * dip, and the whole segment is the copy.
+ *
+ * Returns {s0, s1, t0, t1, identity}: the copy on the read (s) and on the
+ * reverse complement (t), with the identity over its columns. */
+function capSelfCopy(s, t, aln, P) {
+    var sub = capSubTable(P), go = P.gapOpen + P.gapExtend, ge = P.gapExtend;
+    var ops = aln.ops || '', i = aln.sStart, j = aln.tStart, last = '';
+    var inCore = false, run = 0, maxRun = 0, minSeg = 0, m = 0, c = 0;
+    var maxI = aln.coreSStart, maxJ = aln.coreTStart, maxM = 0, maxC = 0;
+    var cutI = -1, cutJ = -1, cutM = 0, cutC = 0;
+    for (var o = 0; o < ops.length; o++) {
+        if (!inCore && i === aln.coreSStart && j === aln.coreTStart) inCore = true;
+        if (i === aln.coreSEnd && j === aln.coreTEnd) break;
+        var op = ops.charAt(o), step, match = 0;
+        if (op === 'M') {
+            var a = s.charAt(i), b = t.charAt(j);
+            match = (CAP_BITS[a] & CAP_BITS[b]) ? 1 : 0;
+            step = sub[a.charCodeAt(0) * 128 + b.charCodeAt(0)];
+            i++; j++;
+        } else {
+            step = last === op ? ge : go;
+            if (op === 'I') i++; else j++;
+        }
+        last = op;
+        if (!inCore) continue;
+        run += step; m += match; c++;
+        if (run > maxRun) { maxRun = run; maxI = i; maxJ = j; maxM = m; maxC = c; }
+        if (run - maxRun < minSeg) { minSeg = run - maxRun; cutI = maxI; cutJ = maxJ; cutM = maxM; cutC = maxC; }
+    }
+    if (minSeg <= -CAP_FOLD_JUNK && cutI >= 0) {
+        return { s0: aln.coreSStart, s1: cutI, t0: aln.coreTStart, t1: cutJ,
+                 identity: cutC ? 100 * cutM / cutC : 0 };
+    }
+    return { s0: aln.coreSStart, s1: aln.coreSEnd, t0: aln.coreTStart, t1: aln.coreTEnd,
+             identity: aln.coreIdentity };
+}
+
+function capFoldbacks(reads, P) {
+    var K = P.kmer, W = P.maxOverhang, found = [];
+    if (!P.chimeraCheck || !(P.foldbackMin > 0)) return found;
+    var mask = K === 15 ? 0x3FFFFFFF : ((1 << (2 * K)) - 1), rcShift = 2 * (K - 1);
+    var codes = null, rcodes = null, ok = null, keyT = null, posT = null, nextT = null, cap = 0, tcap = 0;
+    var gate = function (r) {
+        return r.coreIdentity >= P.minIdentity - 5 &&
+               Math.max(r.coreSEnd - r.coreSStart, r.coreTEnd - r.coreTStart) >= P.foldbackMin * 0.5;
+    };
+    for (var ri = 0; ri < reads.length; ri++) {
+        var rd = reads[ri], L = rd.len, seq = rd.seq;
+        // Nothing could be cut off and still leave a read.
+        if (L < P.foldbackMin + P.minReadLen) continue;
+        var nW = L - K + 1, p, c;
+        if (cap < nW) { cap = nW; codes = new Int32Array(cap); rcodes = new Int32Array(cap); ok = new Uint8Array(cap); nextT = new Int32Array(cap); }
+        // Forward and reverse-complement code of every word; a word spanning an
+        // N, or a palindrome (its own reverse complement), is unusable.
+        var code = 0, rcode = 0, valid = 0;
+        for (p = 0; p < L; p++) {
+            c = CAP_CODE[seq.charCodeAt(p)];
+            if (c < 0) { valid = 0; code = 0; rcode = 0; } else {
+                code = ((code << 2) | c) & mask;
+                rcode = ((rcode >>> 2) | ((3 - c) << rcShift)) & mask;
+                valid++;
+            }
+            if (p >= K - 1) {
+                var at = p - K + 1;
+                codes[at] = code; rcodes[at] = rcode;
+                ok[at] = (valid >= K && code !== rcode) ? 1 : 0;
+            }
+        }
+        // Open-addressing hash of the forward codes: keyT holds the code, posT
+        // the first position with it, nextT chains the others.
+        var size = 1; while (size < 2 * nW) size <<= 1;
+        if (tcap < size) { tcap = size; keyT = new Int32Array(tcap); posT = new Int32Array(tcap); }
+        for (p = 0; p < size; p++) keyT[p] = -1;
+        var hmask = size - 1;
+        for (p = 0; p < nW; p++) {
+            if (!ok[p]) continue;
+            var h = Math.imul(codes[p], 0x9E3779B1) >>> 0 & hmask;
+            while (keyT[h] !== -1 && keyT[h] !== codes[p]) h = (h + 1) & hmask;
+            if (keyT[h] === -1) { keyT[h] = codes[p]; posT[h] = p; nextT[p] = -1; }
+            else { nextT[p] = posT[h]; posT[h] = p; }
+        }
+        // Every (p, p') with word(p) = rc(word(p')), p < p', bucketed by p + p'.
+        var bins = new Map();
+        for (var q = 0; q < nW; q++) {
+            if (!ok[q]) continue;
+            var hq = Math.imul(rcodes[q], 0x9E3779B1) >>> 0 & hmask;
+            while (keyT[hq] !== -1 && keyT[hq] !== rcodes[q]) hq = (hq + 1) & hmask;
+            if (keyT[hq] === -1) continue;
+            for (p = posT[hq]; p !== -1; p = nextT[p]) {
+                if (p >= q) continue;
+                var bin = Math.floor((p + q) / CAP_FOLD_BIN);
+                var e = bins.get(bin);
+                if (e) { e.cnt++; e.sum += p + q; } else bins.set(bin, { cnt: 1, sum: p + q });
+            }
+        }
+        if (!bins.size) continue;
+        var best = null, bestCnt = 0, bestBin = 0;
+        bins.forEach(function (e, b) {
+            var cnt = e.cnt, lo = bins.get(b - 1), hi = bins.get(b + 1);
+            if (lo) cnt += lo.cnt;
+            if (hi) cnt += hi.cnt;
+            if (cnt > bestCnt || (cnt === bestCnt && b < bestBin)) { bestCnt = cnt; best = e; bestBin = b; }
+        });
+        if (bestCnt < P.minSeeds) continue;
+        // Diagonal j − i of the read (i) against its reverse complement (j): the
+        // word at p' on the read is the word at L − K − p' on the reverse
+        // complement, so the pair (p, p') lies on j − i = L − K − (p + p').
+        var d = L - K - Math.round(best.sum / best.cnt);
+        var rcs = capRC(seq);
+        var aln = capAlignAuto(seq, rcs, d, P, true, gate);
+        if (!aln) continue;
+        var copy = capSelfCopy(seq, rcs, aln, P);
+        var cLen = Math.max(copy.s1 - copy.s0, copy.t1 - copy.t0);
+        if (cLen < P.foldbackMin || copy.identity < P.minIdentity) continue;
+        // The two copies on the read: the aligned stretch of the read itself, and
+        // the aligned stretch of the reverse complement mapped back.
+        var i0 = copy.s0, i1 = copy.s1, f0 = L - copy.t1, f1 = L - copy.t0;
+        var e0, e1, l0, l1;
+        if (i0 <= f0) { e0 = i0; e1 = i1; l0 = f0; l1 = f1; } else { e0 = f0; e1 = f1; l0 = i0; l1 = i1; }
+        if (l1 < L - W && e0 > W) continue;         // an inverted repeat inside the read
+        var from, to, gap = l0 - e1;
+        if (gap >= Math.max(CAP_FOLD_LOOP, P.minReadLen)) {
+            // Copies apart: keep what lies between. Either copy may be the one the
+            // strand re-read, so neither is kept (a read X·Y·rc(X) is molecule X·Y
+            // read on into its own complement, or molecule Y·rc(X) preceded by it,
+            // and nothing on the read tells which). The alignment places a copy's
+            // edge only to within the last bases that failed to match, so the
+            // kept stretch is drawn in by one word at each end: measured on a
+            // fold-back read the copy began 4 nt earlier than the alignment said,
+            // and those 4 nt reached past the end of the product in the consensus.
+            from = e1 + K; to = l0 - K;
+        } else if (gap >= 0) {
+            if (e1 >= L - l0) { from = 0; to = e1; } else { from = l0; to = L; }
+        } else {
+            // A hairpin with no loop between the copies aligns to its own reverse
+            // complement over its whole length, so both copies came out as that one
+            // stretch; the fold is its midpoint, and the copies are reported either
+            // side of it.
+            var cut = Math.round((e0 + e1 + l0 + l1) / 4);
+            e1 = cut; l0 = cut;
+            if (cut >= L - cut) { from = 0; to = cut; } else { from = cut; to = L; }
+        }
+        // Reported on the read as given: capParseReads may already have clipped
+        // its ends (endTrim, qualClip, terminal N), so the offsets found here are
+        // on the clipped sequence and move by that clip.
+        var base = rd.clipLeft;
+        var rec = { idx: rd.idx, id: rd.id, len: rd.origLen, copies: [e0 + base, e1 + base, l0 + base, l1 + base],
+                    kept: [from + base, to + base], identity: copy.identity, action: 'trimmed', read: rd };
+        if (to - from < P.minReadLen) {
+            rec.action = 'dropped'; rec.kept = null;
+        } else {
+            rd.seq = seq.substring(from, to);
+            rd.len = to - from;
+            if (rd.qual) rd.qual = rd.qual.slice(from, to);
+            rd.clipLeft += from;
+            rd.clipRight += L - to;
+        }
+        found.push(rec);
+    }
+    // Dropped reads leave the array; indices are positions, so renumber.
+    var drop = new Set();
+    found.forEach(function (f) { if (f.action === 'dropped') drop.add(f.read); });
+    if (drop.size) {
+        var kept = reads.filter(function (r) { return !drop.has(r); });
+        reads.length = 0;
+        for (var k = 0; k < kept.length; k++) { kept[k].idx = k; reads.push(kept[k]); }
+    }
+    found.forEach(function (f) { f.idx = f.action === 'dropped' ? -1 : f.read.idx; delete f.read; });
+    return found;
 }
 
 /* ───────────────────────── 4. k-mer seeding & candidate pairs ────────────── */
@@ -1173,6 +1476,12 @@ function capCoverageStep(A, B, flip, aln, P, threshold) {
 
 /* ───────────────────────────── 5. Overlap computation ────────────────────── */
 
+// The local identity below which a stretch inside an overlap is a chimeric
+// junction: the value set, or 35 points under minIdentity, never below 40.
+function capJunctionIdentity(P) {
+    return P.junctionIdentity > 0 ? P.junctionIdentity : Math.max(40, P.minIdentity - 35);
+}
+
 /**
  * Align one candidate pair and decide whether it is an acceptable overlap.
  * Returns an overlap record, or {rejected:'…'} describing why it was refused.
@@ -1233,6 +1542,32 @@ function capOverlapPair(reads, cand, P, repeatThreshold) {
     if (aln.identity < P.minIdentity) {
         return { a: cand.a, b: cand.b, flip: cand.flip, olen: olen, identity: aln.identity,
                  rejected: 'identity too low (' + aln.identity.toFixed(1) + '% < ' + P.minIdentity + '%)' };
+    }
+
+    // ── the junction filter ──
+    // Two chimeric reads made of the same two products in the same order share
+    // one product on one side of their junctions and the other product on the
+    // other side, with a stretch between the two junctions where one read has
+    // the first product and the other the second: unrelated sequence. Judged
+    // as a whole the alignment passes — the stretch is a small part of it — and
+    // the overhang test sees nothing either, since the matching flanks on both
+    // sides keep the stretch inside the maximal segment. Judged locally it
+    // cannot pass: no stretch of CAP_JUNCTION_WINDOW columns between two reads
+    // of one molecule falls to the identity of random sequence, and the gap
+    // run that the shift between the two junctions forces into the alignment
+    // counts against the window as well. Read errors stay well clear of the
+    // threshold (see junctionIdentity in CAP_DEFAULTS), so the test costs one
+    // genuine overlap in tens of thousands at R9 error levels and none at R10.
+    // A junction at the very end of an overlap is caught too, when the
+    // overhang test let it through as shorter than maxOverhang.
+    if (P.chimeraCheck) {
+        var jId = capJunctionIdentity(P);
+        if (aln.coreMinWindow < jId) {
+            return { a: cand.a, b: cand.b, flip: cand.flip, olen: olen, identity: aln.identity,
+                     rejected: 'identity falls to ' + aln.coreMinWindow.toFixed(0) + '% over ' + CAP_JUNCTION_WINDOW +
+                               ' columns inside the overlap (< ' + jId + '%) — the reads agree on either side ' +
+                               'of that stretch but not across it, as at a chimeric junction' };
+        }
     }
 
     // ── the second repeat filter ──
@@ -1356,6 +1691,16 @@ async function capSerialOverlapRunner(reads, pairs, P, ctx, repeatThreshold) {
 var CAP_CHIMERA_GAP = 200;
 var CAP_CHIMERA_MIN = 3;
 
+// Number of sorted values in [lo, hi].
+function capCountIn(arr, lo, hi) {
+    var a = 0, b = arr.length, m;
+    while (a < b) { m = (a + b) >> 1; if (arr[m] < lo) a = m + 1; else b = m; }
+    var first = a;
+    b = arr.length;
+    while (a < b) { m = (a + b) >> 1; if (arr[m] <= hi) a = m + 1; else b = m; }
+    return a - first;
+}
+
 function capChimeras(reads, overlaps, P) {
     var W = Math.max(P.kmer, P.maxOverhang);
     var edge = Math.max(P.minOverlap, W);
@@ -1366,15 +1711,7 @@ function capChimeras(reads, overlaps, P) {
         add(o.a, o.aStart, o.aEnd);
         add(o.b, o.flip ? Lb - o.bEnd : o.bStart, o.flip ? Lb - o.bStart : o.bEnd);
     }
-    // Number of sorted values in [lo, hi].
-    var countIn = function (arr, lo, hi) {
-        var a = 0, b = arr.length, m;
-        while (a < b) { m = (a + b) >> 1; if (arr[m] < lo) a = m + 1; else b = m; }
-        var first = a;
-        b = arr.length;
-        while (a < b) { m = (a + b) >> 1; if (arr[m] <= hi) a = m + 1; else b = m; }
-        return a - first;
-    };
+    var countIn = capCountIn;
     var found = [];
     for (var r = 0; r < reads.length; r++) {
         var list = iv[r];
@@ -1417,6 +1754,116 @@ function capChimeras(reads, overlaps, P) {
                 2 * ending >= leftDepth && 2 * starting >= rightDepth) {
                 hit = { read: r, at: at, to: Math.max(at, bestTo), ending: ending, starting: starting, spanning: spanning };
             }
+        }
+        if (hit) found.push(hit);
+    }
+    return found;
+}
+
+/* Chimeras proven by parting.
+ *
+ * The pile test sees only accepted overlaps, and a ligation chimera has few of
+ * those. The reads of either molecule align with it up to the junction and then
+ * go on with their own sequence, which the overhang filter refuses as it would a
+ * shared repeat; what it accepts are reads that lie wholly inside one half, and
+ * through those the chimera still reaches the layout, now as a container whose
+ * other half hangs off the contig. Measured on 400 reads of two 2 kb products
+ * with 10 % chimeras: five junction chimeras, each holding the kept middle of a
+ * fold-back read, built two contigs extended by 366 and 676 nt.
+ *
+ * The refusals themselves are the evidence. On the chimera every partner parts
+ * at the junction and no accepted overlap runs across it; on a read of either
+ * molecule the same partings fall at that molecule's position, but its siblings
+ * cross there. A junction is called where
+ *   • at least CAP_CHIMERA_MIN partners part within 2 × CAP_PILE_JITTER of one
+ *     another, their agreement with the read ending there (they vouch for the
+ *     read before the point and contradict it after) or beginning there;
+ *   • those partings are at least half of all the overlaps, accepted or refused,
+ *     that cover the read just before (or after) the point: the whole side parts;
+ *   • the accepted overlaps crossing the point number no more than a quarter of
+ *     the partings, as in the pile test, so chimeras sharing a junction and
+ *     crossing it for one another are still caught.
+ * One side is enough. When the other molecule has no reads in the set nothing
+ * can begin at the junction, but the read's continuation is still contradicted
+ * by every partner and vouched for by none. A read of one amplicon has none of
+ * this: its siblings cross every position.
+ *
+ * Returns records shaped as capChimeras's, with evidence 'parting'. */
+function capPartingChimeras(reads, overlaps, rejected, P) {
+    var W = Math.max(P.kmer, P.maxOverhang), J2 = 2 * CAP_PILE_JITTER;
+    var acc = new Array(reads.length), cover = new Array(reads.length);
+    var pEnd = new Array(reads.length), pStart = new Array(reads.length);
+    var push = function (arr, r, v) { (arr[r] || (arr[r] = [])).push(v); };
+    var i, o, Lb, bFrom, bTo;
+    for (i = 0; i < overlaps.length; i++) {
+        o = overlaps[i]; Lb = reads[o.b].len;
+        push(acc, o.a, [o.aStart, o.aEnd]);
+        push(acc, o.b, [o.flip ? Lb - o.bEnd : o.bStart, o.flip ? Lb - o.bStart : o.bEnd]);
+    }
+    for (i = 0; i < rejected.length; i++) {
+        o = rejected[i];
+        if (o.aStart === undefined || o.leftOverhang === undefined) continue;
+        var left = o.leftOverhang > P.maxOverhang, right = o.rightOverhang > P.maxOverhang;
+        Lb = reads[o.b].len;
+        bFrom = o.flip ? Lb - o.bEnd : o.bStart; bTo = o.flip ? Lb - o.bStart : o.bEnd;
+        push(cover, o.a, [o.aStart, o.aEnd]);
+        push(cover, o.b, [bFrom, bTo]);
+        // The partner agrees with a over [aStart, aEnd) and parts at the edge where
+        // both reads go on: at aStart the agreement begins, at aEnd it ends. On b's
+        // own strand a flipped overlap swaps the two.
+        if (left) { push(pStart, o.a, o.aStart); push(o.flip ? pEnd : pStart, o.b, o.flip ? bTo : bFrom); }
+        if (right) { push(pEnd, o.a, o.aEnd); push(o.flip ? pStart : pEnd, o.b, o.flip ? bFrom : bTo); }
+    }
+    var num = function (x, y) { return x - y; };
+    var found = [];
+    for (var r = 0; r < reads.length; r++) {
+        var E = pEnd[r] || [], S = pStart[r] || [];
+        if (E.length < CAP_CHIMERA_MIN && S.length < CAP_CHIMERA_MIN) continue;
+        E.sort(num); S.sort(num);
+        var L = reads[r].len, A = acc[r] || [], C = cover[r] || [], j, k, c, lo, hi, spanning;
+        var depthAt = function (p) {
+            var n = 0;
+            for (var q = 0; q < A.length; q++) if (A[q][0] <= p && A[q][1] > p) n++;
+            for (q = 0; q < C.length; q++) if (C[q][0] <= p && C[q][1] > p) n++;
+            return n;
+        };
+        var crossing = function (from, to) {
+            var n = 0;
+            for (var q = 0; q < A.length; q++) if (A[q][0] < from && A[q][1] > to) n++;
+            return n;
+        };
+        var hit = null;
+        // Agreement ends here: the read's continuation to the right is contradicted.
+        for (j = 0; j < E.length && !hit; j++) {
+            var at = E[j], ending = capCountIn(E, at, at + J2);
+            if (ending < CAP_CHIMERA_MIN) continue;
+            var bestTo = at, starting = 0;
+            for (k = 0; k < S.length; k++) {
+                if (S[k] < at - W || S[k] > at + CAP_CHIMERA_GAP) continue;
+                c = capCountIn(S, S[k], S[k] + J2);
+                if (c > starting) { starting = c; bestTo = S[k]; }
+            }
+            lo = Math.min(at, bestTo) - W; hi = Math.max(at, bestTo) + W;
+            spanning = crossing(lo, hi);
+            if (4 * spanning > ending || 2 * ending < depthAt(Math.max(0, lo - W))) continue;
+            hit = { read: r, at: at, to: Math.max(at, bestTo), ending: ending, starting: starting,
+                    spanning: spanning, evidence: 'parting' };
+        }
+        // Agreement begins here: the continuation to the left is contradicted.
+        for (j = S.length - 1; j >= 0 && !hit; j--) {
+            var to = S[j], starting2 = capCountIn(S, to - J2, to);
+            if (starting2 < CAP_CHIMERA_MIN) continue;
+            var bestAt = to, ending2 = 0;
+            for (k = 0; k < E.length; k++) {
+                if (E[k] > to + W || E[k] < to - CAP_CHIMERA_GAP) continue;
+                c = capCountIn(E, E[k] - J2, E[k]);
+                if (c > ending2) { ending2 = c; bestAt = E[k]; }
+            }
+            lo = Math.min(to, bestAt) - W; hi = Math.max(to, bestAt) + W;
+            spanning = crossing(lo, hi);
+            if (4 * spanning > starting2 || 2 * starting2 < depthAt(Math.min(L - 1, hi + W))) continue;
+            hit = { read: r, at: Math.min(to, bestAt), to: to, ending: ending2, starting: starting2,
+                    spanning: spanning, evidence: 'parting' };
         }
         if (hit) found.push(hit);
     }
@@ -2544,15 +2991,105 @@ function capContigConsensus(reads, aligned, P, model) {
                        isPoly: isPoly, alleles: alleles });
     }
 
+    var trimmed = capTrimEnds(consensus, columns, variants, P);
+    // Mean coverage of what is left: the cut tails were the thin part.
+    var covN = cols.length;
+    if (trimmed[0] || trimmed[1]) {
+        covSum = 0; covN = 0;
+        for (var ki = 0; ki < columns.length; ki++) {
+            if (columns[ki].trimmed) continue;
+            covSum += columns[ki].coverage; covN++;
+        }
+    }
+
     return {
         consensus: consensus.join(''),
         columns: columns,
         variants: variants,
-        meanCoverage: cols.length ? covSum / cols.length : 0
+        trimmed: trimmed,
+        meanCoverage: covN ? covSum / covN : 0
     };
 }
 
 function shallowCounts(c) { return { a: c.a, c: c.c, g: c.g, t: c.t }; }
+
+/* Contig ends by coverage.
+ *
+ * Whatever reaches the layout with an unmatched tail — a fold-back copy shorter
+ * than foldbackMin, a junction within maxOverhang of a read's end, adapter left
+ * on a read — is laid beyond the last base the other reads support, and the
+ * consensus runs on through it on the word of one or two reads. The end of a
+ * contig is therefore cut back to the last column carried by at least
+ * minEndCov reads, or by CAP_END_COV_FRAC of the contig's median coverage when
+ * that is more (at 200 reads a tail carried by five of them is still a tail).
+ *
+ * Only a thin stretch longer than maxOverhang is cut. Reads of one PCR product
+ * end within a few bases of one another, not at one base, so the coverage
+ * tapers over the last bases of a genuine end and the final base may be
+ * carried by few reads; cutting that taper would shorten every product by a
+ * base or two. A tail is hundreds of bases; the taper is not.
+ *
+ * Applied to the consensus array in place: the trimmed columns lose their
+ * consensus position (they stay in the alignment view, as columns with no
+ * consensus base), the kept columns and variants are renumbered, and variants
+ * in the trimmed part — the ambiguity codes two disagreeing tails produce — go.
+ * Returns [bases cut from the start, bases cut from the end]. */
+var CAP_END_COV_FRAC = 0.05;
+
+function capTrimEnds(consensus, columns, variants, P) {
+    var cut = [0, 0], i;
+    if (!(P.minEndCov > 0)) return cut;
+    var covs = [];
+    for (i = 0; i < columns.length; i++) if (columns[i].pos >= 0) covs.push(columns[i].coverage);
+    var n = covs.length;
+    if (!n) return cut;
+    var sorted = covs.slice().sort(function (x, y) { return x - y; });
+    var t = Math.max(P.minEndCov, Math.ceil(CAP_END_COV_FRAC * sorted[n >> 1]));
+    // A contig whose body is itself thin is left alone. At one or two reads of
+    // coverage every end is carried by one read, and the rule above cut a
+    // 4-read, 9.7 kb contig of the bundled Nanopore example down to the 2 kb
+    // where three of its reads overlap. The threshold means something only
+    // well under the body's coverage: trimming needs a median of at least
+    // twice the threshold.
+    if (2 * t > sorted[n >> 1]) return cut;
+    var lo = 0;
+    while (lo < n && covs[lo] < t) lo++;
+    if (lo >= n) return cut;                 // no column reaches t: nothing to cut back to
+    var hi = n - 1;
+    while (hi > lo && covs[hi] < t) hi--;
+    if (lo > P.maxOverhang) cut[0] = lo;
+    if (n - 1 - hi > P.maxOverhang) cut[1] = n - 1 - hi;
+    if (!cut[0] && !cut[1]) return cut;
+    var from = cut[0], to = n - cut[1];
+    // Columns are cut by position in the alignment, so the gap-only columns
+    // (pos −1) inside a cut stretch go with it and those between kept bases stay.
+    var ciLo = -1, ciHi = -1;
+    for (i = 0; i < columns.length; i++) {
+        if (columns[i].pos < 0) continue;
+        if (ciLo < 0 && columns[i].pos >= from) ciLo = i;
+        if (columns[i].pos < to) ciHi = i;
+    }
+    for (i = 0; i < columns.length; i++) {
+        var col = columns[i];
+        if (i < ciLo || i > ciHi) {
+            col.pos = -1; col.base = ''; col.isPoly = false; col.alleles = []; col.trimmed = true;
+        } else if (col.pos >= 0) {
+            col.pos -= from;
+        }
+    }
+    var keptVariants = [];
+    for (i = 0; i < variants.length; i++) {
+        var v = variants[i];
+        if (v.pos < from || v.pos >= to) continue;
+        v.pos -= from;
+        keptVariants.push(v);
+    }
+    variants.length = 0;
+    Array.prototype.push.apply(variants, keptVariants);
+    consensus.splice(to, consensus.length - to);
+    consensus.splice(0, from);
+    return cut;
+}
 
 /* ───────────────────────────── 8. Orchestration ──────────────────────────── */
 
@@ -2626,6 +3163,18 @@ async function capAssemble(params, opts) {
     var reads = parsed.reads;
     var notes = parsed.notes.slice();
 
+    // Fold-back reads are cut back to one copy of their sequence before anything
+    // is seeded, so the index and the overlaps never see the second copy.
+    var foldbacks = capFoldbacks(reads, P);
+    if (foldbacks.length) {
+        var fDropped = foldbacks.filter(function (f) { return f.action === 'dropped'; }).length;
+        notes.push(foldbacks.length + ' read(s) end in the reverse complement of their own sequence (fold-back reads: ' +
+                   'the strand was read on into its complement). ' +
+                   (foldbacks.length - fDropped) + ' were cut back to one copy' +
+                   (fDropped ? ' and ' + fDropped + ' dropped because what remained was shorter than minReadLen' : '') +
+                   '. They are listed under Fold-back reads.');
+    }
+
     if (reads.length < 1) {
         return capEmptyResult(P, notes, 'No usable sequences were found in the input.');
     }
@@ -2664,13 +3213,22 @@ async function capAssemble(params, opts) {
     // and it is reported on its own rather than as a singleton (which would put
     // the joined sequence into the FASTA as if it were a fragment of the target).
     var chimeras = P.chimeraCheck ? capChimeras(reads, ovRes.overlaps, P) : [];
+    if (P.chimeraCheck) {
+        var flagged = new Set(chimeras.map(function (c) { return c.read; }));
+        chimeras.forEach(function (c) { c.evidence = 'piles'; });
+        capPartingChimeras(reads, ovRes.overlaps, ovRes.rejected, P).forEach(function (c) {
+            if (!flagged.has(c.read)) { flagged.add(c.read); chimeras.push(c); }
+        });
+        chimeras.sort(function (x, y) { return x.read - y.read; });
+    }
     if (chimeras.length) {
         var isChimera = new Set(chimeras.map(function (c) { return c.read; }));
         ovRes.overlaps = ovRes.overlaps.filter(function (o) { return !isChimera.has(o.a) && !isChimera.has(o.b); });
         notes.push(chimeras.length + ' read(s) carry two molecules joined in one read (a ligation chimera, a ' +
                    'fold-back read, or two molecules read back to back) and were set aside: the reads that ' +
-                   'overlap one half stop at the junction, those that overlap the other half start there, and ' +
-                   'almost none run across it. They are listed under Chimeric reads.');
+                   'overlap one part stop at the junction or part from the read there, those that overlap ' +
+                   'the other part start there, and almost none run across it. They are listed under ' +
+                   'Chimeric reads.');
     }
 
     // After the chimeras are out, so a chimera's own continuation cannot vouch
@@ -2686,6 +3244,7 @@ async function capAssemble(params, opts) {
         lay.singletons = lay.singletons.filter(function (ri) { return !isChimera.has(ri); });
     }
     lay.chimeras = chimeras;
+    lay.foldbacks = foldbacks;
 
     // Measure the sequencing error rate from the assembly's own overlaps instead
     // of assuming one. A pairwise alignment shows a mismatch when EITHER read is
@@ -2722,6 +3281,7 @@ async function capAssemble(params, opts) {
             consensus: cons.consensus,
             columns: cons.columns,
             variants: cons.variants,
+            trimmed: cons.trimmed,
             meanCoverage: cons.meanCoverage,
             split: lay.contigs[c].split
         });
@@ -2742,7 +3302,7 @@ function capFinish(reads, contigs, lay, ovRes, cand, P, notes, elapsed, threads,
     var n50 = 0, acc = 0;
     for (var i = 0; i < lens.length; i++) { acc += lens[i]; if (acc >= totalBp / 2) { n50 = lens[i]; break; } }
     var placed = contigs.reduce(function (a, c) { return a + c.reads.length; }, 0);
-    var variants = 0, snps = 0, indels = 0, ties = 0;
+    var variants = 0, snps = 0, indels = 0, ties = 0, trimmedBp = 0;
     contigs.forEach(function (c) {
         variants += c.variants.length;
         c.variants.forEach(function (v) {
@@ -2750,7 +3310,10 @@ function capFinish(reads, contigs, lay, ovRes, cand, P, notes, elapsed, threads,
             else if (v.kind === 'indel') indels++;
             else if (v.kind === 'tie') ties++;
         });
+        if (c.trimmed) trimmedBp += c.trimmed[0] + c.trimmed[1];
     });
+    var foldbacks = lay.foldbacks || [];
+    var foldbacksDropped = foldbacks.filter(function (f) { return f.action === 'dropped'; }).length;
 
     return {
         ok: true,
@@ -2759,6 +3322,7 @@ function capFinish(reads, contigs, lay, ovRes, cand, P, notes, elapsed, threads,
         contigs: contigs,
         singletons: lay.singletons,
         chimeras: lay.chimeras || [],
+        foldbacks: foldbacks,
         overlaps: ovRes.overlaps,
         rejected: ovRes.rejected,
         conflicts: lay.conflicts,
@@ -2770,6 +3334,9 @@ function capFinish(reads, contigs, lay, ovRes, cand, P, notes, elapsed, threads,
             readsPlaced: placed,
             singletons: lay.singletons.length,
             chimeras: (lay.chimeras || []).length,
+            foldbacks: foldbacks.length - foldbacksDropped,
+            foldbacksDropped: foldbacksDropped,
+            trimmedBp: trimmedBp,
             contigs: contigs.length,
             totalBp: totalBp,
             n50: n50,
@@ -2782,6 +3349,7 @@ function capFinish(reads, contigs, lay, ovRes, cand, P, notes, elapsed, threads,
             variants: variants, snps: snps, indels: indels, ties: ties,
             errorRate: model ? model.errorRate : 0,
             alpha: model ? model.alpha : 0,
+            junctionIdentity: capJunctionIdentity(P),
             elapsedMs: elapsed,
             threads: threads
         }
@@ -2790,13 +3358,15 @@ function capFinish(reads, contigs, lay, ovRes, cand, P, notes, elapsed, threads,
 
 function capEmptyResult(P, notes, message) {
     return {
-        ok: false, message: message, params: P, reads: [], contigs: [], singletons: [], chimeras: [],
+        ok: false, message: message, params: P, reads: [], contigs: [], singletons: [], chimeras: [], foldbacks: [],
         overlaps: [], rejected: [], conflicts: [], candidates: 0,
         seedStats: { words: 0, seeds: 0, skippedWords: 0, truncated: false },
         notes: notes,
-        stats: { readsIn: 0, readsPlaced: 0, singletons: 0, chimeras: 0, contigs: 0, totalBp: 0, n50: 0,
+        stats: { readsIn: 0, readsPlaced: 0, singletons: 0, chimeras: 0, foldbacks: 0, foldbacksDropped: 0,
+                 trimmedBp: 0, contigs: 0, totalBp: 0, n50: 0,
                  longest: 0, meanCoverage: 0, overlaps: 0, rejected: 0, conflicts: 0,
-                 variants: 0, snps: 0, indels: 0, ties: 0, elapsedMs: 0, threads: 1 }
+                 variants: 0, snps: 0, indels: 0, ties: 0, junctionIdentity: capJunctionIdentity(P),
+                 elapsedMs: 0, threads: 1 }
     };
 }
 
@@ -2820,6 +3390,8 @@ function capNow() {
         computeOverlaps: capComputeOverlaps,           // synchronous; the Worker entry point
         serialOverlapRunner: capSerialOverlapRunner,
         overlapPair: capOverlapPair,
+        foldbacks: capFoldbacks, partingChimeras: capPartingChimeras,
+        junctionIdentity: capJunctionIdentity,
         layout: capLayout,
         contigAlign: capContigAlign,
         contigConsensus: capContigConsensus,
