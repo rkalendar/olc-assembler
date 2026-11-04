@@ -112,7 +112,8 @@ Assembly
   --end-trim N          Bases clipped from both ends of every read (default 0).
   --end-penalty N       End-gap penalty (default 0).
   --no-rc               Do not consider reverse-complement overlaps.
-  --no-chimera-check    Keep reads that look like two molecules joined in one read.
+  --no-chimera-check    Keep reads that look like two molecules joined in one read: no
+                        fold-back trimming, no junction test, no chimeras set aside.
   --no-repeat-guard     Do not refuse joins across a repeat proven by divergence.
   --no-singletons       Leave unassembled reads out of the FASTA.
   --set KEY=VALUE       Any other engine parameter by name (repeatable), e.g. --set minSeeds=2.
@@ -532,8 +533,13 @@ async function main() {
     if (opts.alignment) fs.writeFileSync(prefix + '.alignment.txt', CapReport.alignmentText(result, { width: 100 }));
     if (opts.placements) fs.writeFileSync(prefix + '.placements.tsv', CapReport.placements(result));
     const used = (result.reads || []).length;
+    const S = result.stats || {};
     say(`  [${k}/${keys.length}] ${label || 'all reads'}: ${fmt(used)} of ${fmt(b.seen)} reads → ${contigs.length} contig(s), longest ${fmt(longest)} bp, ` +
-        `${(result.singletons || []).length} singleton(s), ${secs.toFixed(1)} s on ${pool.runner.threadsUsed} thread(s)`);
+        `${(result.singletons || []).length} singleton(s)` +
+        (S.chimeras ? `, ${S.chimeras} chimeric read(s) set aside` : '') +
+        (S.foldbacks || S.foldbacksDropped ? `, ${S.foldbacks} fold-back read(s) trimmed${S.foldbacksDropped ? ` and ${S.foldbacksDropped} dropped` : ''}` : '') +
+        (S.trimmedBp ? `, ${fmt(S.trimmedBp)} bp of contig ends trimmed` : '') +
+        `, ${secs.toFixed(1)} s on ${pool.runner.threadsUsed} thread(s)`);
     rows.push([label || 'all', b.seen, used, contigs.length, longest, totalBp, (result.singletons || []).length, pool.runner.threadsUsed, secs.toFixed(1), status]);
   }
   pool.terminate();
