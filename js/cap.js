@@ -2022,7 +2022,7 @@ function capProvenRepeats(reads, overlaps, rejected, P) {
         kept.push(ov);
     }
     overlaps.length = 0;
-    Array.prototype.push.apply(overlaps, kept);
+    for (i = 0; i < kept.length; i++) overlaps.push(kept[i]);
     return refused;
 }
 
@@ -3085,7 +3085,7 @@ function capTrimEnds(consensus, columns, variants, P) {
         keptVariants.push(v);
     }
     variants.length = 0;
-    Array.prototype.push.apply(variants, keptVariants);
+    for (i = 0; i < keptVariants.length; i++) variants.push(keptVariants[i]);
     consensus.splice(to, consensus.length - to);
     consensus.splice(0, from);
     return cut;
@@ -3235,7 +3235,7 @@ async function capAssemble(params, opts) {
     // for a repeat.
     if (P.repeatGuard) {
         var provenRefused = capProvenRepeats(reads, ovRes.overlaps, ovRes.rejected, P);
-        Array.prototype.push.apply(ovRes.rejected, provenRefused);
+        for (var pr = 0; pr < provenRefused.length; pr++) ovRes.rejected.push(provenRefused[pr]);
     }
 
     ctx.stage('layout');
