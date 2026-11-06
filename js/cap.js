@@ -155,6 +155,15 @@ var CAP_DEFAULTS = {
                          // as polymorphism while a true 50/50 het site is caught.
     polyMaxP: 0,         // significance level for the binomial test; 0 = auto
                          // (1/total columns, i.e. ~1 false call per assembly)
+    // ── alleles ── (capAlleles)
+    alleles: true,       // give each allele of a contig its own sequence when its reads
+                         // fall into groups at linked positions; off, a contig is one
+                         // sequence with ambiguity codes
+    alleleMinSites: 2,   // linked positions needed, at least 10 bases apart
+    alleleMinReads: 3,   // reads in the smallest allele …
+    alleleMinFrac: 5,    // … and its share of the separated reads, %
+    alleleMaxP: 0.001,   // significance of the linkage between two positions, after
+                         // correction for the number of pairs tried
     qualWeight: true,    // weight base votes by PHRED quality when quality is supplied
     endPenalty: 0,       // down-weight this many bases at each read end (0 = off)
     includeSingletons: true
@@ -218,6 +227,10 @@ function capParams(p) {
     num('foldbackMin', 0, 100000);
     num('junctionIdentity', 0, 100);
     num('minEndCov', 0, 100000);
+    num('alleleMinSites', 1, 100000);
+    num('alleleMinReads', 2, 100000);
+    num('alleleMinFrac', 0.1, 50);
+    num('alleleMaxP', 1e-12, 1);
 
     q.kmer = Math.round(q.kmer);
     q.minSeeds = Math.round(q.minSeeds);
@@ -226,6 +239,9 @@ function capParams(p) {
     q.chimeraCheck = !!q.chimeraCheck;
     q.repeatGuard = !!q.repeatGuard;
     q.qualWeight = !!q.qualWeight;
+    q.alleles = !!q.alleles;
+    q.alleleMinSites = Math.round(q.alleleMinSites);
+    q.alleleMinReads = Math.round(q.alleleMinReads);
     q.includeSingletons = !!q.includeSingletons;
     return q;
 }
@@ -2946,9 +2962,13 @@ function capRunVote(reads, aligned, P) {
     return { calls: forced, runs: lengthened };
 }
 
-function capContigConsensus(reads, aligned, P, model) {
+// With a frame {joint, own, variantsAt} the alignment holds the reads of one
+// allele: they vote at the columns in own, and every other column takes the call
+// of the whole contig, joint (see capAlleleOwn).
+function capContigConsensus(reads, aligned, P, model, frame) {
     model = model || {};
-    var runVote = capRunVote(reads, aligned, P), forced = runVote.calls, runsLengthened = runVote.runs;
+    var runVote = frame ? { calls: frame.forced || new Map(), runs: 0 } : capRunVote(reads, aligned, P);
+    var forced = runVote.calls, runsLengthened = runVote.runs;
     // Probability that one read shows a PARTICULAR wrong base at a position. The
     // error rate is measured from the assembly's own overlaps rather than assumed
     // (see capAssemble), and divided by three because an error has three ways to
@@ -3023,6 +3043,23 @@ function capContigConsensus(reads, aligned, P, model) {
         var nonGap = counts.a + counts.c + counts.g + counts.t;
         covSum += cov;
 
+        if (frame && !frame.own.has(ci)) {
+            var jc = frame.joint.columns[ci], kept = jc.pos >= 0;
+            if (kept) {
+                (frame.variantsAt.get(ci) || []).forEach(function (jv) {
+                    var copy = {};
+                    for (var key in jv) if (Object.prototype.hasOwnProperty.call(jv, key)) copy[key] = jv[key];
+                    copy.pos = consensus.length;
+                    variants.push(copy);
+                });
+                consensus.push(jc.base);
+            }
+            columns.push({ col: ci, pos: kept ? consensus.length - 1 : -1, coverage: cov, gap: gap, other: other,
+                           counts: shallowCounts(counts), base: kept ? jc.base : '', isPoly: kept && jc.isPoly,
+                           alleles: kept ? jc.alleles : [], trimmed: jc.trimmed });
+            continue;
+        }
+
         if (!nonGap) {
             // No read gave an unambiguous base here. If some read gave an
             // ambiguous one, the column still exists and must still produce a
@@ -3042,11 +3079,12 @@ function capContigConsensus(reads, aligned, P, model) {
             continue;
         }
         var runCall = forced.get(ci);
+        var spelt = !!frame && runCall !== undefined;
         if (runCall === '' || (runCall === undefined && gap > cov / 2)) {
             // Most reads have no base here: the insertion is a minority event.
             // Drop the column from the consensus but record it as an indel variant
             // when enough reads support it.
-            if (nonGap >= P.polyMinCount && cov >= P.polyMinCov &&
+            if (!spelt && nonGap >= P.polyMinCount && cov >= P.polyMinCov &&
                 (100 * nonGap / cov) >= P.polyMinFrac) {
                 variants.push({ col: ci, pos: consensus.length, kind: 'indel',
                                 coverage: cov, counts: shallowCounts(counts), gap: gap,
@@ -3090,7 +3128,7 @@ function capContigConsensus(reads, aligned, P, model) {
         var alleles = [{ base: major, count: counts[major] }];
         var isPoly = false;
         var minP = 1;
-        if (cov >= P.polyMinCov) {
+        if (cov >= P.polyMinCov && !spelt) {
             for (var oi = 1; oi < order.length; oi++) {
                 var b = order[oi];
                 var frac = 100 * counts[b] / nonGap;
@@ -3124,7 +3162,7 @@ function capContigConsensus(reads, aligned, P, model) {
                             note: 'reads split evenly, the bases equally far inside their reads' });
         }
         // Gaps present in a minority of reads are a deletion polymorphism.
-        if (gap > 0 && gap >= P.polyMinCount && cov >= P.polyMinCov &&
+        if (!spelt && gap > 0 && gap >= P.polyMinCount && cov >= P.polyMinCov &&
             (100 * gap / cov) >= P.polyMinFrac) {
             variants.push({ col: ci, pos: pos, kind: 'indel', coverage: cov,
                             counts: shallowCounts(counts), gap: gap, code: call,
@@ -3136,7 +3174,7 @@ function capContigConsensus(reads, aligned, P, model) {
                        isPoly: isPoly, alleles: alleles });
     }
 
-    var trimmed = capTrimEnds(consensus, columns, variants, P);
+    var trimmed = frame ? frame.joint.trimmed.slice() : capTrimEnds(consensus, columns, variants, P);
     // Mean coverage of what is left: the cut tails were the thin part.
     var covN = cols.length;
     if (trimmed[0] || trimmed[1]) {
@@ -3235,6 +3273,501 @@ function capTrimEnds(consensus, columns, variants, P) {
     consensus.splice(to, consensus.length - to);
     consensus.splice(0, from);
     return cut;
+}
+
+/* Alleles: the reads of one contig separated by linked positions.
+ *
+ * The column vote sees each position alone. Two alleles of one product therefore
+ * come out as one sequence with an ambiguity code wherever they differ, and an
+ * allele carried by fewer than polyMinFrac of the reads leaves no trace at all.
+ * The reads hold more than the columns do: a read of an amplicon covers every
+ * variable position, so the bases of one allele travel together. Two positions at
+ * which the same reads carry the second commonest base, far more often than chance
+ * allows, are linked (the exact test of Fisher on the 2 x 2 table of the reads,
+ * both directions, corrected for the number of pairs tried). The largest set of
+ * linked positions sorts the reads into two groups, and the groups are then
+ * refined on every column where their majorities differ. Each group is searched
+ * again, so three or more alleles come apart in turn. An allele is then the
+ * consensus of all the reads of the contig, with the calls of its own reads at
+ * the columns where they part from the rest (capAlleleOwn).
+ *
+ * What it will not do, and why:
+ *   - One position is not enough. A single column is exactly what a systematic
+ *     error of the chemistry looks like, and the column test already writes it as
+ *     an ambiguity code. Linkage needs two positions at least CAP_ALLELE_APART
+ *     bases apart: a read whose alignment slipped at an indel shows wrong bases
+ *     in neighbouring columns, and those are linked by construction.
+ *   - A group confined to one strand is not an allele when the other group is
+ *     not confined to it too. Errors that depend on the strand recur at the same
+ *     positions in the same reads, which is linkage; alleles do not know which
+ *     strand was read. The contig is left whole and a note says so. A library
+ *     read on one strand only passes: both groups are then on that strand.
+ *   - A contig tiled from shorter reads is left whole when fewer than
+ *     CAP_ALLELE_SPAN of its reads reach a linked position: the rest could go
+ *     with either group, and two stretches not joined by a read have no phase.
+ *   - Alleles differing only by an indel are not separated; indels separate once
+ *     substitutions have sorted the reads.
+ *
+ * Reads that carry no linked position, or as many of one allele as of the other,
+ * vote in both groups and are counted in neither. */
+var CAP_ALLELE_APART = 10;
+var CAP_ALLELE_SPAN = 0.75;
+var CAP_ALLELE_STRAND = 0.9;     // share of one strand that confines a group to it
+var CAP_ALLELE_MAX_CAND = 600;   // candidate columns kept, the best supported first
+var CAP_ALLELE_ROUNDS = 3;       // rounds of separation: up to eight sequences a contig
+var CAP_ALLELE_MAJORITY = 0.6;   // share of a group's bases that makes its base at a column
+
+var CAP_LOGFACT = [0];
+function capLogFact(n) {
+    for (var i = CAP_LOGFACT.length; i <= n; i++) CAP_LOGFACT.push(CAP_LOGFACT[i - 1] + Math.log(i));
+    return CAP_LOGFACT[n];
+}
+
+/* The exact test of Fisher, one-sided: the probability of a or more reads in the
+   first cell of the table [[a, b], [c, d]] when rows and columns are independent. */
+function capFisherGE(a, b, c, d) {
+    var n = a + b + c + d, r1 = a + b, c1 = a + c, hi = Math.min(r1, c1), p = 0;
+    var k = capLogFact(r1) + capLogFact(n - r1) + capLogFact(c1) + capLogFact(n - c1) - capLogFact(n);
+    for (var x = a; x <= hi; x++) {
+        var w = n - r1 - c1 + x;
+        if (w < 0) continue;
+        p += Math.exp(k - capLogFact(x) - capLogFact(r1 - x) - capLogFact(c1 - x) - capLogFact(w));
+    }
+    return p > 1 ? 1 : p;
+}
+
+// Positions at least CAP_ALLELE_APART bases apart, counted along a sorted list.
+function capAlleleSites(at) {
+    var sites = 0, last = -Infinity;
+    for (var i = 0; i < at.length; i++) if (at[i] - last >= CAP_ALLELE_APART) { sites++; last = at[i]; }
+    return sites;
+}
+
+/* The columns where the majorities of two groups of reads differ. side[k] is -1 or
+   +1 for the read in slot k, 0 for a read in neither group. */
+function capAlleleMarkers(cols, slot, side, basePos) {
+    var out = [];
+    for (var ci = 0; ci < cols.length; ci++) {
+        var a = [0, 0, 0, 0], b = [0, 0, 0, 0], ga = 0, gb = 0, ta = 0, tb = 0;
+        cols[ci].forEach(function (cell, ri) {
+            var s = side[slot.get(ri)];
+            if (!s) return;
+            var code = CAP_CODE[cell & 127], gap = (cell & 127) === 45;
+            if (s < 0) { ta++; if (code >= 0) a[code]++; else if (gap) ga++; }
+            else { tb++; if (code >= 0) b[code]++; else if (gap) gb++; }
+        });
+        if (!ta || !tb || 2 * ga > ta || 2 * gb > tb) continue;
+        var xa = 0, xb = 0, j;
+        for (j = 1; j < 4; j++) { if (a[j] > a[xa]) xa = j; if (b[j] > b[xb]) xb = j; }
+        if (xa === xb || a[xa] < 2 || b[xb] < 2) continue;
+        if (a[xa] < CAP_ALLELE_MAJORITY * (a[0] + a[1] + a[2] + a[3])) continue;
+        if (b[xb] < CAP_ALLELE_MAJORITY * (b[0] + b[1] + b[2] + b[3])) continue;
+        out.push({ col: ci, at: basePos[ci], a: xa, b: xb });
+    }
+    return out;
+}
+
+/* Two groups among the reads of one alignment, or null. Returns
+   {side, sites, refused}: side[k] for the read of rows[k]; refused names the
+   reason a significant separation was not used ("strand" or "span"). */
+function capAlleleSplit(aligned, P) {
+    var rows = aligned.rows, cols = aligned.cols, R = rows.length;
+    var minReads = P.alleleMinReads, minFrac = P.alleleMinFrac / 100;
+    if (R < 2 * minReads) return null;
+    var slot = new Map(), i, j, k, t;
+    for (i = 0; i < R; i++) slot.set(rows[i].readIdx, i);
+
+    // Candidate columns: a second base in enough reads to be an allele of the
+    // smallest size allowed, less the reads that lost it to an error.
+    var cand = [], basePos = new Int32Array(cols.length), bp = 0;
+    var needN = Math.max(2, minReads - 1), needF = 0.6 * minFrac;
+    for (var ci = 0; ci < cols.length; ci++) {
+        var n = [0, 0, 0, 0], gap = 0, col = cols[ci];
+        col.forEach(function (cell) {
+            var code = CAP_CODE[cell & 127];
+            if (code >= 0) n[code]++; else if ((cell & 127) === 45) gap++;
+        });
+        var nonGap = n[0] + n[1] + n[2] + n[3];
+        basePos[ci] = bp;
+        if (!nonGap || 2 * gap > col.size) continue;
+        bp++;
+        var b1 = 0, b2 = -1;
+        for (j = 1; j < 4; j++) if (n[j] > n[b1]) b1 = j;
+        for (j = 0; j < 4; j++) if (j !== b1 && n[j] > 0 && (b2 < 0 || n[j] > n[b2])) b2 = j;
+        if (b2 < 0 || n[b2] < needN || n[b2] < needF * nonGap) continue;
+        cand.push({ col: ci, at: basePos[ci], b1: b1, b2: b2, n2: n[b2] });
+    }
+    if (cand.length < 2) return null;
+    if (cand.length > CAP_ALLELE_MAX_CAND) {
+        cand.sort(function (x, y) { return y.n2 - x.n2 || x.col - y.col; });
+        cand.length = CAP_ALLELE_MAX_CAND;
+        cand.sort(function (x, y) { return x.col - y.col; });
+    }
+    // Each candidate as a vector over the reads: +1 the second base, -1 the first,
+    // 0 anything else, a gap, or a read that does not reach the column.
+    cand.forEach(function (q) {
+        var v = new Int8Array(R), seen = new Uint8Array(R), minor = [], none = [], major = 0;
+        cols[q.col].forEach(function (cell, ri) {
+            var s = slot.get(ri), code = CAP_CODE[cell & 127];
+            seen[s] = 1;
+            if (code === q.b2) { v[s] = 1; minor.push(s); }
+            else if (code === q.b1) { v[s] = -1; major++; }
+            else none.push(s);
+        });
+        for (var s2 = 0; s2 < R; s2++) if (!seen[s2]) none.push(s2);
+        q.v = v; q.minor = minor; q.none = none; q.major = major;
+    });
+
+    // Every pair far enough apart: the reads carrying the second base at one
+    // position against the two bases at the other.
+    capLogFact(R);
+    var best1 = [], tables = [];
+    for (i = 0; i < cand.length; i++) {
+        var A = cand[i];
+        for (j = i + 1; j < cand.length; j++) {
+            var B = cand[j];
+            if (B.at - A.at < CAP_ALLELE_APART) continue;
+            // The smallest p this pair could ever give: every read with the rarer of
+            // the two second bases carrying the other one too.
+            var ma = A.minor.length, mb = B.minor.length, lo = Math.min(ma, mb);
+            best1.push(capFisherGE(lo, ma - lo, mb - lo, R - ma - mb + lo));
+            var pp = 0, pm = 0, mp = 0, z = 0;
+            for (t = 0; t < ma; t++) {
+                var vb = B.v[A.minor[t]];
+                if (vb > 0) pp++; else if (vb < 0) pm++;
+            }
+            if (pp < 2 && pm < 2) continue;
+            for (t = 0; t < mb; t++) if (A.v[B.minor[t]] < 0) mp++;
+            for (t = 0; t < B.none.length; t++) if (A.v[B.none[t]] < 0) z++;
+            tables.push(i, j, pp, pm, mp, A.major - mp - z);
+        }
+    }
+    if (!tables.length) return null;
+    // The level is divided by the number of tests that could have come out
+    // significant at it, not by all of them (the correction of Tarone, 1990). Two
+    // columns with the second base in two reads each cannot be linked at any
+    // sensible level however the reads fall, and at 50 noisy reads there are tens
+    // of thousands of such pairs: dividing by them put the level at 7e-9 and a
+    // rarer allele of ten reads, nine of them agreeing at both of its two
+    // positions (p = 4e-8), went unseen. Two tests a pair, one for each phase.
+    var sorted = Float64Array.from(best1).sort(), reach = sorted.length, tests = 1;
+    for (; tests <= sorted.length; tests++) {
+        while (reach > 0 && sorted[reach - 1] > P.alleleMaxP / (2 * tests)) reach--;
+        if (reach <= tests) break;
+    }
+    if (!reach) return null;
+    var alpha = P.alleleMaxP / (2 * tests);
+    var adj = cand.map(function () { return []; }), linked = 0;
+    for (t = 0; t < tables.length; t += 6) {
+        var pp2 = tables[t + 2], pm2 = tables[t + 3], mp2 = tables[t + 4], mm2 = tables[t + 5];
+        // Same phase: the second bases go together. Opposite phase: the second base
+        // of one goes with the first base of the other, as it does when two alleles
+        // are equally common and a read or two decide which base is "second".
+        var cis = pp2 >= 2 ? capFisherGE(pp2, pm2, mp2, mm2) : 1;
+        var trans = pm2 >= 2 && mp2 >= 2 ? capFisherGE(pm2, pp2, mm2, mp2) : 1;
+        if (Math.min(cis, trans) > alpha) continue;
+        var sign = cis <= trans ? 1 : -1;
+        adj[tables[t]].push({ to: tables[t + 1], sign: sign });
+        adj[tables[t + 1]].push({ to: tables[t], sign: sign });
+        linked++;
+    }
+    if (!linked) return null;
+
+    // Linked positions form sets; the phase of each member follows from the first.
+    var phase = new Int8Array(cand.length), best = null;
+    for (i = 0; i < cand.length; i++) {
+        if (phase[i] || !adj[i].length) continue;
+        var members = [i], head = 0;
+        phase[i] = 1;
+        while (head < members.length) {
+            var u = members[head++];
+            for (t = 0; t < adj[u].length; t++) {
+                var e = adj[u][t];
+                if (!phase[e.to]) { phase[e.to] = phase[u] * e.sign; members.push(e.to); }
+            }
+        }
+        members.sort(function (x, y) { return x - y; });
+        var sites = capAlleleSites(members.map(function (m) { return cand[m].at; }));
+        if (!best || sites > best.sites || (sites === best.sites && members.length > best.members.length)) {
+            best = { members: members, sites: sites };
+        }
+    }
+    if (!best || best.sites < P.alleleMinSites) return null;
+
+    var score = new Int32Array(R), side = new Int8Array(R);
+    best.members.forEach(function (m) {
+        var q = cand[m], ph = phase[m];
+        for (var s = 0; s < R; s++) score[s] += ph * q.v[s];
+    });
+    for (k = 0; k < R; k++) side[k] = score[k] > 0 ? 1 : score[k] < 0 ? -1 : 0;
+
+    // Refine on every column where the two groups now differ, until no read moves.
+    var markers = [];
+    for (var round = 0; round < 8; round++) {
+        markers = capAlleleMarkers(cols, slot, side, basePos);
+        if (!markers.length) return null;
+        var sc = new Int32Array(R), moved = 0;
+        markers.forEach(function (m) {
+            cols[m.col].forEach(function (cell, ri) {
+                var code = CAP_CODE[cell & 127], s = slot.get(ri);
+                if (code === m.b) sc[s]++; else if (code === m.a) sc[s]--;
+            });
+        });
+        for (k = 0; k < R; k++) {
+            var now = sc[k] > 0 ? 1 : sc[k] < 0 ? -1 : 0;
+            if (now !== side[k]) { side[k] = now; moved++; }
+        }
+        if (!moved) break;
+    }
+    markers = capAlleleMarkers(cols, slot, side, basePos);
+    var nSites = capAlleleSites(markers.map(function (m) { return m.at; }));
+    if (nSites < P.alleleMinSites) return null;
+
+    var na = 0, nb = 0, fa = 0, fb = 0;
+    for (k = 0; k < R; k++) {
+        if (side[k] < 0) { na++; if (!rows[k].flip) fa++; }
+        else if (side[k] > 0) { nb++; if (!rows[k].flip) fb++; }
+    }
+    if (na < minReads || nb < minReads || Math.min(na, nb) < minFrac * (na + nb)) return null;
+    if (na + nb < CAP_ALLELE_SPAN * R) return { side: side, sites: nSites, refused: 'span' };
+    // One group all but confined to one strand, and the strands of the two groups
+    // too different for chance. A fixed share for both groups was tried first and
+    // let a strand error through: three reads of the affected strand had escaped
+    // it and sat in the other group, 24 forward and 3 reverse against 23 reverse.
+    var pure = Math.max(fa, na - fa) >= CAP_ALLELE_STRAND * na || Math.max(fb, nb - fb) >= CAP_ALLELE_STRAND * nb;
+    if (pure && Math.min(capFisherGE(fa, na - fa, fb, nb - fb),
+                         capFisherGE(na - fa, fa, nb - fb, fb)) <= P.alleleMaxP) {
+        return { side: side, sites: nSites, refused: 'strand' };
+    }
+    return { side: side, sites: nSites, refused: '' };
+}
+
+/* The alignment of some of the reads of a contig: the same columns, holding the
+   cells of those reads only, so a column keeps its number and the call all the
+   reads made there can be looked up. keep maps a read to true when it votes in
+   more than one group. */
+function capSubAlignment(aligned, keep) {
+    var cols = [];
+    for (var ci = 0; ci < aligned.cols.length; ci++) {
+        var m = new Map();
+        aligned.cols[ci].forEach(function (cell, ri) { if (keep.has(ri)) m.set(ri, cell); });
+        cols.push(m);
+    }
+    var rows = [];
+    aligned.rows.forEach(function (rw) {
+        if (!keep.has(rw.readIdx)) return;
+        rows.push({ readIdx: rw.readIdx, flip: rw.flip, first: rw.first, last: rw.last,
+                    shared: !!(rw.shared || keep.get(rw.readIdx)) });
+    });
+    return { cols: cols, rows: rows };
+}
+
+/* The columns at which an allele speaks for itself.
+ *
+ * Sorting the reads halves the depth, or worse: the consensus of forty reads is
+ * better than that of the ten among them that carry the rarer allele, and where
+ * the alleles do not differ there is no reason to ask only the ten. So an allele
+ * takes the call that all the reads of the contig made, except at the columns
+ * where most of its own reads say something else and the reads outside it do not
+ * (the exact test again: its reads against the others, its call against anything
+ * else). A base is held to the level of the linkage; a gap to the stricter level
+ * of the column test, because in a run of one letter a handful of reads lose a
+ * base together by chance, and that is not an allele. */
+function capAlleleOwn(whole, part, joint, P, model) {
+    var own = new Set(), j;
+    var gapLevel = Math.min(P.alleleMaxP, model.alpha || P.alleleMaxP);
+    capLogFact(whole.rows.length);
+    for (var ci = 0; ci < part.cols.length; ci++) {
+        var jc = joint.columns[ci];
+        if (jc.trimmed || !part.cols[ci].size) continue;
+        var g = [0, 0, 0, 0], gGap = 0, gTot = 0, w = [0, 0, 0, 0], wGap = 0, wTot = 0;
+        part.cols[ci].forEach(function (cell) {
+            var code = CAP_CODE[cell & 127];
+            gTot++;
+            if (code >= 0) g[code]++; else if ((cell & 127) === 45) gGap++;
+        });
+        whole.cols[ci].forEach(function (cell) {
+            var code = CAP_CODE[cell & 127];
+            wTot++;
+            if (code >= 0) w[code]++; else if ((cell & 127) === 45) wGap++;
+        });
+        var call, have, all;
+        if (2 * gGap > gTot) { call = ''; have = gGap; all = wGap; }
+        else {
+            var x = 0;
+            for (j = 1; j < 4; j++) if (g[j] > g[x]) x = j;
+            if (g[x] < CAP_ALLELE_MAJORITY * (g[0] + g[1] + g[2] + g[3])) continue;
+            call = 'acgt'.charAt(x); have = g[x]; all = w[x];
+        }
+        var jointCall = jc.pos >= 0 ? jc.base : '';
+        if (call === jointCall || have < 2) continue;
+        var p = capFisherGE(have, gTot - have, all - have, (wTot - gTot) - (all - have));
+        if (p > (call === '' || jointCall === '' ? gapLevel : P.alleleMaxP)) continue;
+        own.add(ci);
+    }
+    return own;
+}
+
+/* Stretches where the reads of an allele spell something the columns do not show.
+ *
+ * The reads of the rarer allele were fitted to a consensus that carries the other
+ * one. Where its base makes or lengthens a run of one letter, or sits beside an
+ * indel, they do not agree on a column for it: at one such position ten reads of
+ * an allele showed three T, two A and five gaps, and the column test found
+ * nothing. The reads themselves agree. So wherever fewer than CAP_ALLELE_MAJORITY
+ * of the reads of an allele follow the call of the contig, each of its reads is
+ * read in its own sequence between two anchor columns a few bases outside, as the
+ * run-length vote does (capRunVote). The commonest spelling replaces the stretch
+ * when it is not the spelling of the contig, is held by at least 30 % of the
+ * reads of the allele and twice as many as the next, and is rare enough among
+ * the other reads (the exact test, at the level of capAlleleOwn; the stricter
+ * one when the length changes).
+ *
+ * Returns the calls as capRunVote does, column -> base or '' for a column that
+ * leaves the consensus, and adds those columns to own. */
+var CAP_ALLELE_JOIN = 2;
+
+function capAlleleLocal(reads, whole, part, joint, own, P, model) {
+    var forced = new Map(), cols = part.cols, nCols = cols.length, ci;
+    var dev = new Uint8Array(nCols), isKept = new Uint8Array(nCols), any = false;
+    for (ci = 0; ci < nCols; ci++) {
+        var jc = joint.columns[ci];
+        if (jc.trimmed) continue;
+        if (jc.pos >= 0) isKept[ci] = 1;
+        var size = cols[ci].size;
+        if (size < 2) continue;
+        var agree = 0, bases = 0, jcode = isKept[ci] ? jc.base.charCodeAt(0) : 0;
+        cols[ci].forEach(function (cell) {
+            var ch = cell & 127;
+            if (ch !== 45) { bases++; if (ch === jcode) agree++; }
+        });
+        if (isKept[ci] ? agree < CAP_ALLELE_MAJORITY * size : bases > (1 - CAP_ALLELE_MAJORITY) * size) {
+            dev[ci] = 1; any = true;
+        }
+    }
+    if (!any) return forced;
+
+    var inPart = new Map();
+    part.rows.forEach(function (rw) { inPart.set(rw.readIdx, rw.flip); });
+    var flipOf = new Map();
+    whole.rows.forEach(function (rw) { flipOf.set(rw.readIdx, rw.flip); });
+    var gapLevel = Math.min(P.alleleMaxP, model.alpha || P.alleleMaxP);
+    capLogFact(whole.rows.length);
+    var between = function (ri, cellA, cellB) {
+        var p = capCellPos(cellA), q = capCellPos(cellB);
+        var s = reads[ri].seq.slice(Math.min(p, q) + 1, Math.max(p, q));
+        return flipOf.get(ri) ? capRC(s) : s;
+    };
+
+    var floor = 0;
+    ci = 0;
+    while (ci < nCols) {
+        if (!dev[ci]) { ci++; continue; }
+        // The stretch: deviating columns no more than CAP_ALLELE_JOIN bases apart.
+        var first = ci, last = ci, quiet = 0, k;
+        for (k = ci + 1; k < nCols && quiet <= CAP_ALLELE_JOIN; k++) {
+            if (dev[k]) { last = k; quiet = 0; } else if (isKept[k]) quiet++;
+        }
+        ci = last + 1;
+        var wanted = false;
+        for (k = first; k <= last; k++) if (dev[k] && !own.has(k)) { wanted = true; break; }
+        if (!wanted) continue;
+        // Anchors: up to CAP_RUN_ANCHOR consensus columns outside, none of them
+        // deviating, and never left of the anchor that closed the last stretch spelt
+        // out, so two stretches a few bases apart do not both write the columns
+        // between them.
+        var aL = -1, aR = -1, steps = 0;
+        for (k = first - 1; k >= floor && steps < CAP_RUN_ANCHOR && !dev[k]; k--) if (isKept[k]) { aL = k; steps++; }
+        steps = 0;
+        for (k = last + 1; k < nCols && steps < CAP_RUN_ANCHOR && !dev[k]; k++) if (isKept[k]) { aR = k; steps++; }
+        if (aL < 0 || aR < 0) continue;
+
+        var spelt = '';
+        for (k = aL + 1; k < aR; k++) if (isKept[k]) spelt += joint.columns[k].base;
+        var tally = new Map(), witness = new Map(), span = 0, right = cols[aR];
+        cols[aL].forEach(function (cell, ri) {
+            var other = right.get(ri);
+            if (other === undefined || (cell & 127) === 45 || (other & 127) === 45) return;
+            var s = between(ri, cell, other);
+            span++;
+            tally.set(s, (tally.get(s) || 0) + 1);
+            if (!witness.has(s)) witness.set(s, ri);
+        });
+        var top = null, m = 0, second = 0;
+        tally.forEach(function (n, s) {
+            if (n > m) { second = m; m = n; top = s; } else if (n > second) second = n;
+        });
+        if (top === null || top === spelt || m < 2 || m < 0.3 * span || m < 2 * second) continue;
+        if (!/^[acgt]*$/.test(top)) continue;
+        var oSpan = 0, oHave = 0, wRight = whole.cols[aR];
+        whole.cols[aL].forEach(function (cell, ri) {
+            if (inPart.has(ri)) return;
+            var other = wRight.get(ri);
+            if (other === undefined || (cell & 127) === 45 || (other & 127) === 45) return;
+            oSpan++;
+            if (between(ri, cell, other) === top) oHave++;
+        });
+        if (capFisherGE(m, span - m, oHave, oSpan - oHave) > (top.length === spelt.length ? P.alleleMaxP : gapLevel)) continue;
+        var w = witness.get(top);
+        for (k = aL + 1; k < aR; k++) {
+            var wc = cols[k].get(w);
+            forced.set(k, wc !== undefined && (wc & 127) !== 45 ? String.fromCharCode(wc & 127) : '');
+            own.add(k);
+        }
+        floor = aR;
+    }
+    return forced;
+}
+
+/* An allele keeps the columns of the whole contig; those that hold none of its
+   bases and no consensus base go, so the alignment view shows its reads without
+   the insertions of the others. */
+function capAlleleCompact(aligned, cons) {
+    var map = new Int32Array(aligned.cols.length), cols = [], columns = [], ci;
+    for (ci = 0; ci < aligned.cols.length; ci++) {
+        var c = cons.columns[ci], n = c.counts;
+        if (c.pos < 0 && !(n.a + n.c + n.g + n.t + c.other)) { map[ci] = -1; continue; }
+        map[ci] = cols.length;
+        c.col = cols.length;
+        cols.push(aligned.cols[ci]);
+        columns.push(c);
+    }
+    cons.variants.forEach(function (v) { v.col = map[v.col]; });
+    var rows = [];
+    aligned.rows.forEach(function (rw) {
+        var f = rw.first, l = rw.last;
+        while (f <= l && map[f] < 0) f++;
+        while (l >= f && map[l] < 0) l--;
+        if (f > l) return;
+        rows.push({ readIdx: rw.readIdx, flip: rw.flip, first: map[f], last: map[l], shared: rw.shared });
+    });
+    aligned.cols = cols; aligned.rows = rows; cons.columns = columns;
+}
+
+/* The alignment of a contig as one alignment per allele. Returns
+   {parts, sites, refused, refusedSites}: parts is [aligned] when the contig
+   stays whole. */
+function capAlleles(aligned, P) {
+    var out = { parts: [], sites: 0, refused: '', refusedSites: 0 };
+    var walk = function (al, round) {
+        var sp = round < CAP_ALLELE_ROUNDS ? capAlleleSplit(al, P) : null;
+        if (!sp || sp.refused) {
+            if (sp && !round) { out.refused = sp.refused; out.refusedSites = sp.sites; }
+            out.parts.push(al);
+            return;
+        }
+        if (!round) out.sites = sp.sites;
+        [-1, 1].forEach(function (want) {
+            var keep = new Map();
+            for (var k = 0; k < al.rows.length; k++) {
+                if (sp.side[k] === want) keep.set(al.rows[k].readIdx, false);
+                else if (!sp.side[k]) keep.set(al.rows[k].readIdx, true);
+            }
+            walk(capSubAlignment(al, keep), round + 1);
+        });
+    };
+    walk(aligned, 0);
+    return out;
 }
 
 /* ───────────────────────────── 8. Orchestration ──────────────────────────── */
@@ -3415,27 +3948,112 @@ async function capAssemble(params, opts) {
     var alpha = P.polyMaxP > 0 ? P.polyMaxP : 1 / Math.max(1, totalCols);
     var model = { errorRate: errorRate, alpha: alpha };
 
-    var contigs = [], runsLengthened = 0;
+    // One sequence per contig, or one per allele where the reads of a contig fall
+    // into groups at linked positions (capAlleles). An allele is the consensus of
+    // the whole contig with the calls of its own reads where they part from the
+    // rest. The alleles of a contig stay together in the output, the one with the
+    // most reads first.
+    var units = [], runsLengthened = 0;
     for (var c = 0; c < lay.contigs.length; c++) {
-        var aligned = aligns[c];
-        var cons = capContigConsensus(reads, aligned, P, model);
-        runsLengthened += cons.runsLengthened;
-        contigs.push({
-            id: lay.contigs[c].id,
-            reads: lay.contigs[c].reads,
-            rows: aligned.rows,
-            cols: aligned.cols,
-            consensus: cons.consensus,
-            columns: cons.columns,
-            variants: cons.variants,
-            trimmed: cons.trimmed,
-            meanCoverage: cons.meanCoverage,
-            split: lay.contigs[c].split
-        });
+        var whole = aligns[c];
+        var joint = capContigConsensus(reads, whole, P, model);
+        runsLengthened += joint.runsLengthened;
+        var al = P.alleles ? capAlleles(whole, P) : null;
+        var unit = { id: lay.contigs[c].id, order: c, len: 0, members: [],
+                     refused: al ? al.refused : '', refusedSites: al ? al.refusedSites : 0 };
+        var built = [];
+        if (al && al.parts.length > 1) {
+            var variantsAt = new Map(), seenSeq = new Set(), distinct = true;
+            joint.variants.forEach(function (v) {
+                if (!variantsAt.has(v.col)) variantsAt.set(v.col, []);
+                variantsAt.get(v.col).push(v);
+            });
+            for (var pi = 0; pi < al.parts.length; pi++) {
+                var own = capAlleleOwn(whole, al.parts[pi], joint, P, model);
+                var local = capAlleleLocal(reads, whole, al.parts[pi], joint, own, P, model);
+                var pc = capContigConsensus(reads, al.parts[pi], P, model,
+                                            { joint: joint, own: own, forced: local, variantsAt: variantsAt });
+                if (seenSeq.has(pc.consensus)) distinct = false;
+                seenSeq.add(pc.consensus);
+                built.push({ aligned: al.parts[pi], cons: pc });
+            }
+            // Two groups that come out as one sequence were not two alleles.
+            if (!distinct) built = [];
+        }
+        if (!built.length) built.push({ aligned: whole, cons: joint });
+        for (var bi = 0; bi < built.length; bi++) {
+            var aligned = built[bi].aligned, cons = built[bi].cons;
+            var placedHere = lay.contigs[c].reads, alleleInfo = null;
+            if (built.length > 1) {
+                var inPart = new Map(), sharedN = 0;
+                aligned.rows.forEach(function (rw) { inPart.set(rw.readIdx, rw.shared); if (rw.shared) sharedN++; });
+                placedHere = placedHere.filter(function (p) { return inPart.has(p.readIdx); });
+                alleleInfo = { reads: inPart.size - sharedN, shared: sharedN };
+                capAlleleCompact(aligned, cons);
+            }
+            unit.members.push({
+                id: lay.contigs[c].id,
+                reads: placedHere,
+                rows: aligned.rows,
+                cols: aligned.cols,
+                consensus: cons.consensus,
+                columns: cons.columns,
+                variants: cons.variants,
+                trimmed: cons.trimmed,
+                meanCoverage: cons.meanCoverage,
+                split: lay.contigs[c].split,
+                allele: alleleInfo
+            });
+            if (cons.consensus.length > unit.len) unit.len = cons.consensus.length;
+        }
+        if (unit.members.length > 1) {
+            unit.members.sort(function (p, q) {
+                return q.allele.reads - p.allele.reads || q.consensus.length - p.consensus.length;
+            });
+        }
+        units.push(unit);
         await ctx.tick('consensus', c + 1, lay.contigs.length);
     }
-    contigs.sort(function (p, q) { return q.consensus.length - p.consensus.length || p.id - q.id; });
-    contigs.forEach(function (ct, k) { ct.id = k + 1; });
+    units.sort(function (p, q) { return q.len - p.len || p.id - q.id || p.order - q.order; });
+    var contigs = [];
+    units.forEach(function (u) {
+        var first = contigs.length + 1, total = 0, shared = 0;
+        u.members.forEach(function (m) {
+            if (m.allele) { total += m.allele.reads; shared = Math.max(shared, m.allele.shared); }
+        });
+        u.members.forEach(function (m, k) {
+            m.id = contigs.length + 1;
+            if (m.allele) {
+                m.allele.index = k + 1;
+                m.allele.of = u.members.length;
+                m.allele.first = first;
+                m.allele.share = total ? m.allele.reads / total : 0;
+                // How far it is from the first allele of the set, in aligned columns.
+                var apart = k ? capAlignAuto(u.members[0].consensus, m.consensus, 0, P, false) : null;
+                m.allele.differs = apart ? apart.mismatches + apart.gaps : 0;
+            }
+            contigs.push(m);
+        });
+        if (u.members.length > 1) {
+            var names = u.members.map(function (m) { return 'Contig' + m.id; });
+            notes.push(names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1] +
+                       ' are alleles of one product: ' +
+                       u.members.map(function (m) { return m.allele.reads; }).join(', ') +
+                       ' reads, ' + (u.members.length > 2 ? 'differing from ' + names[0] + ' at ' : 'differing at ') +
+                       u.members.slice(1).map(function (m) { return m.allele.differs; }).join(', ') + ' position(s)' +
+                       (shared ? '; ' + shared + ' read(s) that carry none of those positions, or as many of ' +
+                                 'one allele as of the other, vote in each and are counted in none' : '') + '.');
+        } else if (u.refused === 'strand') {
+            notes.push('Contig' + first + ': its reads fall into two groups at ' + u.refusedSites +
+                       ' linked position(s), but one group is confined to one strand and the other is not. ' +
+                       'That is an error of the reads that depends on the strand, not two alleles, and the ' +
+                       'contig was left whole.');
+        } else if (u.refused === 'span') {
+            notes.push('Contig' + first + ': some of its reads fall into two groups at ' + u.refusedSites +
+                       ' linked position(s), but fewer than ' + Math.round(100 * CAP_ALLELE_SPAN) +
+                       ' % of the reads reach those positions, so the contig was left whole.');
+        }
+    });
     if (runsLengthened) {
         notes.push(runsLengthened + ' homopolymer run(s) in the consensus were lengthened to the length the reads ' +
                    'carry; the column vote had kept them shorter.');
@@ -3452,7 +4070,12 @@ function capFinish(reads, contigs, lay, ovRes, cand, P, notes, elapsed, threads,
     var totalBp = lens.reduce(function (a, b) { return a + b; }, 0);
     var n50 = 0, acc = 0;
     for (var i = 0; i < lens.length; i++) { acc += lens[i]; if (acc >= totalBp / 2) { n50 = lens[i]; break; } }
-    var placed = contigs.reduce(function (a, c) { return a + c.reads.length; }, 0);
+    var placedSet = new Set(), alleleSets = 0, alleleSeqs = 0;
+    contigs.forEach(function (c) {
+        c.reads.forEach(function (p) { placedSet.add(p.readIdx); });
+        if (c.allele) { alleleSeqs++; if (c.allele.index === 1) alleleSets++; }
+    });
+    var placed = placedSet.size;
     var variants = 0, snps = 0, indels = 0, ties = 0, trimmedBp = 0;
     contigs.forEach(function (c) {
         variants += c.variants.length;
@@ -3498,6 +4121,7 @@ function capFinish(reads, contigs, lay, ovRes, cand, P, notes, elapsed, threads,
             rejected: ovRes.rejected.length,
             conflicts: lay.conflicts.length,
             variants: variants, snps: snps, indels: indels, ties: ties,
+            alleleSets: alleleSets, alleles: alleleSeqs,
             errorRate: model ? model.errorRate : 0,
             alpha: model ? model.alpha : 0,
             junctionIdentity: capJunctionIdentity(P),
@@ -3516,7 +4140,8 @@ function capEmptyResult(P, notes, message) {
         stats: { readsIn: 0, readsPlaced: 0, singletons: 0, chimeras: 0, foldbacks: 0, foldbacksDropped: 0,
                  trimmedBp: 0, contigs: 0, totalBp: 0, n50: 0,
                  longest: 0, meanCoverage: 0, overlaps: 0, rejected: 0, conflicts: 0,
-                 variants: 0, snps: 0, indels: 0, ties: 0, junctionIdentity: capJunctionIdentity(P),
+                 variants: 0, snps: 0, indels: 0, ties: 0, alleleSets: 0, alleles: 0,
+                 junctionIdentity: capJunctionIdentity(P),
                  elapsedMs: 0, threads: 1 }
     };
 }
@@ -3546,6 +4171,7 @@ function capNow() {
         layout: capLayout,
         contigAlign: capContigAlign,
         contigConsensus: capContigConsensus,
+        alleles: capAlleles,
         align: capAlignBanded,
         alignAuto: capAlignAuto,
         rc: capRC,

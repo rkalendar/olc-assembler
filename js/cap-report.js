@@ -112,6 +112,7 @@
             row('Fold-back reads trimmed', S.foldbacks + (S.foldbacksDropped ? ' (and ' + S.foldbacksDropped + ' dropped)' : ''));
         }
         row('Contigs', S.contigs);
+        if (S.alleles) row('Alleles separated', S.alleles + ' sequences from ' + S.alleleSets + ' contig(s)');
         row('Total consensus', S.totalBp + ' bp');
         row('Longest contig', S.longest + ' bp');
         row('N50', S.n50 + ' bp');
@@ -141,6 +142,12 @@
         L.push('polymorphism: minor allele ≥ ' + P.polyMinFrac + '% and ≥ ' + P.polyMinCount +
                ' read(s), column coverage ≥ ' + P.polyMinCov +
                (P.qualWeight ? ' · votes weighted by PHRED quality when supplied' : ''));
+        if (P.alleles !== undefined) {
+            L.push('alleles: ' + (P.alleles
+                ? 'reads of a contig separated at ≥ ' + P.alleleMinSites + ' linked positions · each allele ≥ ' +
+                  P.alleleMinReads + ' reads and ≥ ' + P.alleleMinFrac + '% of the reads'
+                : 'not separated; variable positions are written as ambiguity codes'));
+        }
         L.push('reverse-complement search: ' + (P.allowRC ? 'on' : 'off') +
                ' · chimeric reads: ' + (P.chimeraCheck ? 'set aside' : 'kept') +
                (P.chimeraCheck ? ' (fold-back copies ' + (P.foldbackMin > 0 ? '≥ ' + P.foldbackMin + ' nt trimmed' : 'off') +
@@ -167,6 +174,23 @@
                     fwd, rev, c.trimmed ? c.trimmed[0] : 0, c.trimmed ? c.trimmed[1] : 0].join('\t'));
         });
         L.push('');
+
+        if (S.alleles) {
+            L.push('Alleles');
+            L.push('-------');
+            L.push('Contigs that are alleles of one product: the reads of one assembled contig fell into groups at ' +
+                   'linked positions. An allele is the consensus of all the reads of the product, with the bases of ' +
+                   'its own reads where they differ from the rest. Shared reads carry none of the linked positions ' +
+                   'and vote in every allele of the set. DiffersAt is counted against the first allele of the set.');
+            L.push(['Contig', 'Allele', 'Reads', 'Share(%)', 'SharedReads', 'DiffersAt'].join('\t'));
+            res.contigs.forEach(function (c) {
+                if (!c.allele) return;
+                L.push(['Contig' + c.id, c.allele.index + ' of ' + c.allele.of, c.allele.reads,
+                        pct(100 * c.allele.share), c.allele.shared,
+                        c.allele.index === 1 ? '-' : c.allele.differs].join('\t'));
+            });
+            L.push('');
+        }
 
         L.push('Read placement');
         L.push('--------------');
@@ -363,7 +387,9 @@
             out.push('>Contig' + c.id + ' length=' + c.consensus.length +
                      ' reads=' + c.reads.length +
                      ' cov=' + pct(c.meanCoverage) + 'x' +
-                     ' snp=' + snps + ' indel=' + indels + (ties ? ' tie=' + ties : ''));
+                     ' snp=' + snps + ' indel=' + indels + (ties ? ' tie=' + ties : '') +
+                     (c.allele ? ' allele=' + c.allele.index + '/' + c.allele.of +
+                                 ' share=' + pct(100 * c.allele.share) + '%' : ''));
             out.push(wrap(upper ? c.consensus.toUpperCase() : c.consensus, width));
         });
 
@@ -486,7 +512,8 @@
             var idw = Math.max(12, Math.min(28, Math.max.apply(null, B.rows.map(function (r) { return r.id.length; }).concat([12]))));
             L.push('Contig' + c.id + '  ' + c.consensus.length + ' bp  ·  ' + c.reads.length +
                    ' reads  ·  mean coverage ' + pct(c.meanCoverage) + '×  ·  ' +
-                   B.nCols + ' alignment columns');
+                   B.nCols + ' alignment columns' +
+                   (c.allele ? '  ·  allele ' + c.allele.index + ' of ' + c.allele.of : ''));
             L.push(new Array(70).join('─'));
             for (var start = 0; start < B.nCols; start += width) {
                 var end = Math.min(start + width, B.nCols);
@@ -559,7 +586,8 @@
             var idw = Math.max(12, Math.min(28, Math.max.apply(null, B.rows.map(function (r) { return r.id.length; }).concat([12]))));
             H.push('<span style="color:#0d6efd;font-weight:600">Contig' + c.id + '</span>' +
                    '<span style="color:#555">  ' + c.consensus.length + ' bp · ' + c.reads.length +
-                   ' reads · mean coverage ' + pct(c.meanCoverage) + '× · ' + B.nCols + ' columns</span>\n');
+                   ' reads · mean coverage ' + pct(c.meanCoverage) + '× · ' + B.nCols + ' columns' +
+                   (c.allele ? ' · allele ' + c.allele.index + ' of ' + c.allele.of : '') + '</span>\n');
 
             for (var start = 0; start < B.nCols; start += width) {
                 var end = Math.min(start + width, B.nCols);
