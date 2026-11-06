@@ -1,2 +1,2 @@
 group	reads_seen	reads_used	contigs	longest_bp	total_consensus_bp	singletons	threads	seconds	status
-79	3119	1000	48	11858	110560	870	3	12.6	ok
+79	3119	1000	48	11860	110789	870	3	7.9	ok

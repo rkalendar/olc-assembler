@@ -2,10 +2,10 @@
 
 Reads used:        100
 Placed / singleton: 100 / 0
-Contigs:           1  (longest 1999 bp, N50 1999 bp)
-Consensus total:   1999 bp
-Mean coverage:     99.3×
-Polymorphic sites: 0 SNP, 19 indel
+Contigs:           1  (longest 2000 bp, N50 2000 bp)
+Consensus total:   2000 bp
+Mean coverage:     99.2×
+Polymorphic sites: 0 SNP, 21 indel
 
 === Overlap stage ===
 
@@ -20,10 +20,14 @@ Layout conflicts:    730
 === Error model ===
 
 Sequencing error rate: 3.42%  (measured from the mismatches in this run's own overlaps)
-Polymorphism cut-off:  p < 2.74e-4  (auto: about one false call per assembly)
+Polymorphism cut-off:  p < 2.65e-4  (auto: about one false call per assembly)
 Repeat cut-off:        word copy number ≥ 53  (1.8× the median)
 
 === Performance ===
 
-Elapsed: 8.62 s
+Elapsed: 6.58 s
 Threads: 3 (worker threads)
+
+=== Notices ===
+
+- 1 homopolymer run(s) in the consensus were lengthened to the length the reads carry; the column vote had kept them shorter.

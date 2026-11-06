@@ -2,10 +2,10 @@
 
 Reads used:        100
 Placed / singleton: 100 / 0
-Contigs:           1  (longest 1995 bp, N50 1995 bp)
-Consensus total:   1995 bp
+Contigs:           1  (longest 2000 bp, N50 2000 bp)
+Consensus total:   2000 bp
 Mean coverage:     99.2×
-Polymorphic sites: 0 SNP, 14 indel
+Polymorphic sites: 0 SNP, 19 indel
 
 === Overlap stage ===
 
@@ -25,5 +25,9 @@ Repeat cut-off:        word copy number ≥ 53  (1.8× the median)
 
 === Performance ===
 
-Elapsed: 10.90 s
+Elapsed: 6.65 s
 Threads: 3 (worker threads)
+
+=== Notices ===
+
+- 6 homopolymer run(s) in the consensus were lengthened to the length the reads carry; the column vote had kept them shorter.

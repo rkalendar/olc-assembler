@@ -89,6 +89,13 @@ var CAP_DEFAULTS = {
     gapOpen: -5,         // one-off cost of opening a gap …
     gapExtend: -2,       // … plus this per gap position
 
+    // ── consensus ──
+    consGapOpen: -2,     // gap opening when a read is fitted to the growing consensus
+                         // (capContigAlign, which says why); the rest of the scoring
+                         // is the overlap stage's
+    runVoteMin: 3,       // a consensus run at least this long is checked against the
+                         // run lengths in the reads (capRunVote). 0 = off.
+
     // ── layout ──
     offsetTolerance: 20, // an overlap disagreeing with the layout by more than this
                          // many bases is a conflict, not a join
@@ -198,6 +205,8 @@ function capParams(p) {
     num('mismatchScore', -100, -1);
     num('gapOpen', -100, 0);
     num('gapExtend', -100, -1);
+    num('consGapOpen', -100, 0);
+    num('runVoteMin', 0, 1000);
     num('offsetTolerance', 0, 10000);
     num('repeatFactor', 1.2, 100);
     num('repeatFrac', 0.1, 1);
@@ -2467,6 +2476,22 @@ async function capContigAlign(reads, contig, P, ctx) {
     var consP = capParams(P);
     consP.bandWidth = consBand;
     consP.maxBandWidth = Math.max(P.maxBandWidth, 1024);
+    // A read carrying one base more than the consensus in a run, with a deletion of
+    // its own a few bases away, needs two gaps to say so. At the overlap stage's
+    // price the two gaps cost more than the mismatches of aligning straight across
+    // them, so the extra base lands on a flanking column and is lost to the run,
+    // and the same happens the other way round to a read a base short of a
+    // full-length run. Either way the reads end up agreeing with the reference they
+    // were fitted to, and a run that came out short early on stays short at any
+    // depth: 34 of 46 runs of four lost on R9-like reads had most reads carrying
+    // all four, and at one of them 52 reads in 100 did and the columns showed 34.
+    //
+    // So a gap is cheaper here, but its first base stays dearer than a mismatch.
+    // Level with it, two neighbouring SNPs become an insertion and a deletion,
+    // because the shift wins a match: of 688 sites of 1:1 alleles 637 stayed coded
+    // with the first gap base level with the mismatch, and 678 with it one point
+    // dearer or more, the same as at the overlap stage's price.
+    consP.gapOpen = consP.consGapOpen;
 
     for (var r = 0; r < placed.length; r++) {
         if (ctx) await ctx.tick('aligning contig', r, placed.length);
@@ -2810,8 +2835,120 @@ function capBinomTailGE(n, k, p) {
 // good as any other, and a tie that remains is written as an IUPAC code.
 var CAP_TIE_DEPTH = 50;
 
+/* Homopolymer runs: the length the reads carry, not the length the columns show.
+ *
+ * Column by column, the vote on a run of n bases is a vote on the reference the
+ * reads were fitted to. Against a reference n long, reads missing a base lose it
+ * at various places and every column stays in the majority; against one n−1 long,
+ * the extra base has to find one column, and reads with an error nearby write it
+ * elsewhere. So whichever length the running consensus had when the reads piled
+ * up confirms itself, and depth does not change it.
+ *
+ * The read itself has no such memory. Each read's run is therefore counted in its
+ * own sequence, between two anchor columns just outside the run (the distance
+ * made no difference from 2 to 8 bases), and the histogram decides, upwards only:
+ * the run takes the longest length held by at least CAP_RUN_LEAN times as many
+ * reads as the commonest length, and by two reads at least. A run with a SNP beside
+ * it is left alone: where one allele's flanking base is the run's letter, half the
+ * reads count a base more, and the run would gain a base neither allele has. On
+ * 1:1 alleles this took 8 stray ambiguity codes and 9 indel errors to none and 1.
+ *
+ * Upwards, and leaning long, because reads lose bases in runs far more often than
+ * they gain them: at the runs of the bundled R9.4.1 reads 16-21 % of the reads are
+ * a base short and 5-7 % a base long. Where each base of a run is lost at 13 %
+ * the full length stops being the commonest at seven bases; at 0.75 it is still
+ * taken at eight, at nine it is marginal, and longer runs stay a base short.
+ *
+ * The lean is a bet on that direction, so it is set by what it costs if the bet is
+ * wrong, not by what wins on simulated reads. Six products with whole runs
+ * perturbed towards over-calling (30 % of reads one base long, 10 % two): 29 errors
+ * for the commonest length alone, 31 at 0.75, 61 at 0.6 and 116 at 0.5. On the
+ * under-calling sets 0.6 leaves only 11-27 % fewer errors than 0.75.
+ *
+ * Returns {calls, runs}: calls maps the columns whose call changes to the run's
+ * base, or to '' for a column that leaves the consensus; runs counts the runs
+ * lengthened. */
+var CAP_RUN_ANCHOR = 4;
+var CAP_RUN_LEAN = 0.75;
+// Share of a flanking column's bases that marks a SNP beside the run. The vote can
+// only fire with 3/7 of the reads on the longer length; 0.25 cost a few real
+// corrections, and 0.35 and 0.40 gave the same result.
+var CAP_RUN_FLANK = 0.35;
+
+function capRunVote(reads, aligned, P) {
+    var forced = new Map(), lengthened = 0;
+    if (!(P.runVoteMin > 0)) return { calls: forced, runs: 0 };
+    var cols = aligned.cols, at = [], letters = [], flip = new Map(), i;
+    for (i = 0; i < cols.length; i++) {
+        var b0 = capQuickBase(cols[i]);
+        if (b0) { at.push(i); letters.push(b0); }
+    }
+    for (i = 0; i < aligned.rows.length; i++) flip.set(aligned.rows[i].readIdx, aligned.rows[i].flip);
+
+    var countRun = function (ri, from, to, base) {
+        var seq = reads[ri].seq, lo = Math.min(from, to), hi = Math.min(Math.max(from, to), seq.length - 1);
+        var want = flip.get(ri) ? CAP_COMP[base] : base, best = 0, run = 0;
+        for (var q = lo; q <= hi; q++) {
+            if (seq.charAt(q) === want) { run++; if (run > best) best = run; } else run = 0;
+        }
+        return best;
+    };
+
+    for (var u = 0, v; u < at.length; u = v) {
+        var base = letters[u];
+        for (v = u + 1; v < at.length && letters[v] === base; v++);
+        var c = v - u;
+        if (c < P.runVoteMin || !u || v >= at.length || CAP_CODE[base.charCodeAt(0)] < 0) continue;
+        // Anchors up to CAP_RUN_ANCHOR consensus bases outside the run, never past
+        // another base of the run's letter: the stretch holds this run and no other.
+        var a = u - 1, b = v, steps;
+        for (steps = 1; a > 0 && steps < CAP_RUN_ANCHOR && letters[a - 1] !== base; steps++) a--;
+        for (steps = 1; b + 1 < at.length && steps < CAP_RUN_ANCHOR && letters[b + 1] !== base; steps++) b++;
+        var hist = new Map(), right = cols[at[b]];
+        cols[at[a]].forEach(function (cell, ri) {
+            var other = right.get(ri);
+            if (other === undefined) return;
+            var m = countRun(ri, capCellPos(cell), capCellPos(other), base);
+            hist.set(m, (hist.get(m) || 0) + 1);
+        });
+        var top = 0, want = c;
+        hist.forEach(function (n) { if (n > top) top = n; });
+        hist.forEach(function (n, m) { if (m > want && n >= 2 && n >= CAP_RUN_LEAN * top) want = m; });
+        if (want === c) continue;
+
+        var code = base.charCodeAt(0), snpBeside = false;
+        [at[u - 1], at[v]].forEach(function (side) {
+            var nb = 0, bases = 0;
+            cols[side].forEach(function (cell) {
+                var ch = cell & 127;
+                if (ch !== 45) { bases++; if (ch === code) nb++; }
+            });
+            if (nb >= 2 && nb >= CAP_RUN_FLANK * bases) snpBeside = true;
+        });
+        if (snpBeside) continue;
+
+        // The columns between the run's two neighbours that hold the most of its
+        // base become the run. The extra base has a column of its own, opened for
+        // it by the reads that were not thrown off; if no read did, there is no
+        // column to call and the run stays as it is.
+        var cand = [];
+        for (i = at[u - 1] + 1; i < at[v]; i++) {
+            var nb = 0;
+            cols[i].forEach(function (cell) { if ((cell & 127) === code) nb++; });
+            if (nb) cand.push({ col: i, n: nb });
+        }
+        if (cand.length <= c) continue;
+        cand.sort(function (x, y) { return y.n - x.n || x.col - y.col; });
+        for (i = u; i < v; i++) forced.set(at[i], '');
+        for (i = 0; i < want && i < cand.length; i++) forced.set(cand[i].col, base);
+        lengthened++;
+    }
+    return { calls: forced, runs: lengthened };
+}
+
 function capContigConsensus(reads, aligned, P, model) {
     model = model || {};
+    var runVote = capRunVote(reads, aligned, P), forced = runVote.calls, runsLengthened = runVote.runs;
     // Probability that one read shows a PARTICULAR wrong base at a position. The
     // error rate is measured from the assembly's own overlaps rather than assumed
     // (see capAssemble), and divided by three because an error has three ways to
@@ -2904,7 +3041,8 @@ function capContigConsensus(reads, aligned, P, model) {
                            base: '', isPoly: false, alleles: [] });
             continue;
         }
-        if (gap > cov / 2) {
+        var runCall = forced.get(ci);
+        if (runCall === '' || (runCall === undefined && gap > cov / 2)) {
             // Most reads have no base here: the insertion is a minority event.
             // Drop the column from the consensus but record it as an indel variant
             // when enough reads support it.
@@ -2938,6 +3076,13 @@ function capContigConsensus(reads, aligned, P, model) {
             if (wcounts[tb] === wcounts[order[0]] && counts[tb] === counts[order[0]] && inner[tb] === inner[order[0]]) {
                 tieBits |= CAP_BITS[tb];
             }
+        }
+        // A column the run-length vote called: it may have opened for a stray base
+        // of another letter, but it is in the consensus for the run's base.
+        if (runCall) {
+            order.splice(order.indexOf(runCall), 1);
+            order.unshift(runCall);
+            tieBits = 0;
         }
 
         var major = order[0];
@@ -3007,7 +3152,8 @@ function capContigConsensus(reads, aligned, P, model) {
         columns: columns,
         variants: variants,
         trimmed: trimmed,
-        meanCoverage: covN ? covSum / covN : 0
+        meanCoverage: covN ? covSum / covN : 0,
+        runsLengthened: runsLengthened
     };
 }
 
@@ -3269,10 +3415,11 @@ async function capAssemble(params, opts) {
     var alpha = P.polyMaxP > 0 ? P.polyMaxP : 1 / Math.max(1, totalCols);
     var model = { errorRate: errorRate, alpha: alpha };
 
-    var contigs = [];
+    var contigs = [], runsLengthened = 0;
     for (var c = 0; c < lay.contigs.length; c++) {
         var aligned = aligns[c];
         var cons = capContigConsensus(reads, aligned, P, model);
+        runsLengthened += cons.runsLengthened;
         contigs.push({
             id: lay.contigs[c].id,
             reads: lay.contigs[c].reads,
@@ -3289,6 +3436,10 @@ async function capAssemble(params, opts) {
     }
     contigs.sort(function (p, q) { return q.consensus.length - p.consensus.length || p.id - q.id; });
     contigs.forEach(function (ct, k) { ct.id = k + 1; });
+    if (runsLengthened) {
+        notes.push(runsLengthened + ' homopolymer run(s) in the consensus were lengthened to the length the reads ' +
+                   'carry; the column vote had kept them shorter.');
+    }
 
     return capFinish(reads, contigs, lay, ovRes, cand, P, notes, capNow() - t0,
                      opts.threads || 1, model);

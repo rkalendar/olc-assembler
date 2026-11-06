@@ -72,8 +72,19 @@ Oxford Nanopore R9/R10 reads of PCR products. The stages are those of CAP3:
    that overlaps several reads which do not overlap each other stops the contig rather than guessing.
    The overlaps are sorted deterministically, so the layout does not depend on how many threads
    computed them.
-6. **Column-wise multiple alignment and consensus.** Each read is aligned under its contig. A column
-   is called polymorphic, and given the IUPAC code of its alleles, only when the minority base is
+6. **Column-wise multiple alignment and consensus.** Each read is aligned under its contig, with a
+   cheaper gap than at the overlap stage (gap open −2). At the overlap stage's price a read with one
+   base more than the growing consensus in a homopolymer and a deletion a few bases away is aligned
+   straight across the two as mismatches, its extra base lands outside the run, and a run that came
+   out short stays short whatever the depth. The first base of a gap stays dearer than a mismatch,
+   or two neighbouring SNPs would be written as an insertion and a deletion. The column vote on a
+   run still favours the length the reads were fitted to, so runs of three or more are then checked
+   against the reads themselves: each read's run is counted in its own sequence between anchors just
+   outside the run, and the run takes the longest length held by at least three-quarters as many
+   reads as the commonest length, and by two reads at least. The check only lengthens, because reads
+   lose bases in runs far more often than they gain them. `--set consGapOpen=-5` restores the old
+   price, `--set runVoteMin=0` turns the check off, and the report counts the runs lengthened. A
+   column is called polymorphic, and given the IUPAC code of its alleles, only when the minority base is
    carried by at least two reads, makes up at least 25 % of a column covered by at least three reads,
    and passes a binomial test against the sequencing error rate measured from the data itself. An
    evenly split column is a tie; it goes to the base that lies further inside its read, because read
@@ -253,18 +264,21 @@ divergent means `--min-identity` is above what the reads can reach.
   (or the length of the shortest product) keeps them out of the sample.
 - **Depth.** A few hundred reads per product give the same consensus as thousands; `--max-reads` and
   `--sample` keep the run time proportional to the number of products rather than to the run.
-- **What to expect.** On simulated 1.5–4 kb amplicons with R10 and R9 error profiles, 5 to 1000
-  reads per product, each product came out as one contig and the consensus matched the template
-  except at homopolymer runs: none or one base in 2 kb for R10, up to about ten for R9, where most
-  reads under-call the run length in the same way, a limit of the chemistry that no vote repairs.
-  Check the alignment at homopolymer runs.
+- **What to expect.** On simulated amplicons of 1–2 kb with R10-like and R9-like error profiles,
+  5 to 500 reads per product (sets S1 and S2 of `benchmark/`), R10-like reads gave the template
+  exactly from 50 reads, and R9-like reads gave at most 0.2 % error from 50 reads and the template
+  exactly at 200 and 500. Homopolymer runs of four to seven bases came out at full length (2 of 573
+  lost, from 50 reads on). A longer run can stay a base short, because few reads carry the whole of
+  it: 28 of 67 runs of eight or more were, and a stress set with 20 inserted runs of 4–10 nt per
+  2 kb gave 0.16 % at 200 reads and 0.30 % at 50. Below 20 reads, random errors remain: about 0.3 %
+  at 10 reads. Real reads differ from any simulation, so check the alignment at homopolymer runs.
 - **Chimeric reads.** A few percent of the reads of a PCR library carry two molecules. Fold-back
   reads have their duplicated stretch cut away, overlaps across a junction are refused and ligation
   chimeras are set aside, so the products come out at their own length; the run summary counts
   each kind. Measured on two 2 kb products at 200 reads with 1, 5 and 10 % chimeric reads (half of
   them fold-backs, three replicates each): on R10-like reads every product came out exact and at
-  its own length, on R9-like reads at its own length with the homopolymer floor above (0.20–0.23 %),
-  and every fold-back and ligation chimera was listed. The engine before these checks had
+  its own length, on R9-like reads at its own length with 0.05 % error or less, and every fold-back
+  and ligation chimera was listed. The engine before these checks had
   extended the contigs by the fold-back tails and built contigs out of the ligation chimeras. One
   caveat: a product whose two ends are inverted repeats of each other over 50 nt or more
   (mirrored primer sites, terminal inverted repeats) looks like a fold-back in every full-length

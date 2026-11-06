@@ -134,6 +134,10 @@
         L.push('scoring: match ' + P.matchScore + ', mismatch ' + P.mismatchScore +
                ', gap open ' + P.gapOpen + ', gap extend ' + P.gapExtend + ' · band ±' + P.bandWidth +
                ' (max ±' + P.maxBandWidth + ')');
+        if (P.consGapOpen !== undefined) {
+            L.push('consensus: reads fitted with gap open ' + P.consGapOpen + ' · homopolymer runs ' +
+                   (P.runVoteMin > 0 ? 'of ≥ ' + P.runVoteMin + ' nt checked against the run lengths in the reads' : 'not checked against the reads'));
+        }
         L.push('polymorphism: minor allele ≥ ' + P.polyMinFrac + '% and ≥ ' + P.polyMinCount +
                ' read(s), column coverage ≥ ' + P.polyMinCov +
                (P.qualWeight ? ' · votes weighted by PHRED quality when supplied' : ''));

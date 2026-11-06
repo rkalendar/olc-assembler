@@ -1,4 +1,4 @@
 group	reads_seen	reads_used	contigs	longest_bp	total_consensus_bp	singletons	threads	seconds	status
-01	100	100	1	1995	1995	0	3	10.9	ok
-02	100	100	1	1986	1986	0	3	10.2	ok
-03	100	100	1	1999	1999	0	3	8.6	ok
+01	100	100	1	2000	2000	0	3	6.7	ok
+02	100	100	1	2000	2000	0	3	6.5	ok
+03	100	100	1	2000	2000	0	3	6.6	ok

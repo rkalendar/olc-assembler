@@ -54,10 +54,8 @@ recommends for R9 flow cells, every read is placed:
 node tools/cap-cli.js examples/synthetic/reads-r9.fastq.gz --out examples/synthetic/out/r9 --bin-regex "barcode(\d+)" --min-identity 85
 ```
 
-Expected (`synthetic/expected/r9.bins.tsv`): one contig per barcode, 1995, 1986 and 1999 bp, all
-reads placed. The contigs differ from their templates by 5, 14 and 1 edits (0.25 %, 0.70 % and
-0.05 %), all of them in homopolymer runs that most reads under-call in the same way, which is the
-expected limit of R9 data. About 20–30 s.
+Expected (`synthetic/expected/r9.bins.tsv`): one contig per barcode, each exactly 2000 bp, all reads
+placed, and each identical to its template. About 20–30 s.
 
 To check any contigs file against the templates:
 
@@ -86,8 +84,8 @@ in the report). Expected (`nanopore/expected/barcode79.bins.tsv` and the report'
 | Reads placed in contigs | 130 |
 | Singletons | 870 |
 | Contigs | 48 |
-| Longest contig | 11,858 bp |
-| N50 | 4062 bp |
+| Longest contig | 11,860 bp |
+| N50 | 4065 bp |
 | Candidate pairs aligned | 7888 |
 | Overlaps accepted / rejected | 102 / 7786 |
 | Time | about 10–15 s on three threads, 260–300 MB |
