@@ -95,6 +95,26 @@ Oxford Nanopore R9/R10 reads of PCR products. The stages are those of CAP3:
    cut from each end are given per contig in the report. A contig whose own median coverage is
    under twice that threshold is left alone: at one or two reads of coverage every end is carried
    by one read.
+7. **Alleles.** The column vote sees one position at a time, so two alleles of one product come
+   out as one sequence with an IUPAC code wherever they differ, and an allele carried by fewer than
+   a quarter of the reads leaves no trace. The reads hold more: a read of an amplicon covers every
+   variable position, so the bases of one allele travel together. Two positions at least ten bases
+   apart are linked when the same reads carry the second commonest base at both far more often
+   than chance allows (Fisher's exact test in both phases, the level divided by the number of pairs
+   that could have reached it). The largest set of linked positions sorts the reads of the contig
+   into two groups, each group is searched again, and every allele is written as a sequence of its
+   own: the consensus of all the reads of the product, with the bases of its own reads at the
+   columns where they differ from the rest. Where a base of the rarer allele lengthens a run of
+   one letter its reads do not agree on a column for it, so there each read is read in its own
+   sequence between two anchors, as for homopolymers. Reads that carry no linked position, or as
+   many of one allele as of the other, vote in every allele and are counted in none. Three things
+   are refused. One variable position is not enough: a single column is what a systematic error
+   looks like, and it stays an IUPAC code. A group confined to one strand, when the other group is
+   not, is an error that depends on the strand; the contig is left whole and the report says so. A
+   contig tiled from shorter reads is left whole when fewer than three-quarters of its reads reach
+   a linked position. Alleles that differ only by an indel are not separated. `--no-alleles`
+   keeps one sequence per contig; `alleleMinSites` (2), `alleleMinReads` (3), `alleleMinFrac`
+   (5 %) and `alleleMaxP` (0.001) set the thresholds through `--set`.
 
 The design is explained stage by stage in the comments of `js/cap.js`, and the parameters are
 documented, with the reasoning behind each default, in `CAP_DEFAULTS` at the top of that file.
@@ -214,6 +234,8 @@ Assembly
   --no-chimera-check    Keep reads that look like two molecules joined in one read: no
                         fold-back trimming, no junction test, no chimeras set aside.
   --no-repeat-guard     Do not refuse joins across a repeat proven by divergence.
+  --no-alleles          Keep a contig whose reads fall into alleles as one sequence with
+                        ambiguity codes, instead of one sequence per allele.
   --no-singletons       Leave unassembled reads out of the FASTA.
   --set KEY=VALUE       Any other engine parameter by name (repeatable), e.g. --set minSeeds=2.
 
@@ -237,8 +259,8 @@ For `--out runs/sample1` and a group named `79`:
 
 | File | Content |
 |---|---|
-| `runs/sample1.79.contigs.fasta` | The consensus sequences, upper case, one record per contig. The header carries `length`, `reads`, `cov` (mean coverage), `snp` and `indel` (polymorphic sites called) and `tie` (evenly split columns, carried as IUPAC codes). Unassembled reads follow, marked as singletons, unless `--no-singletons`. |
-| `runs/sample1.79.report.txt` | The assembly report: a run summary (reads used, placed, singletons, chimeric and fold-back reads, contigs, total consensus, longest contig, N50, mean coverage, candidate pairs, overlaps accepted and rejected, layout conflicts, polymorphic sites, contig ends trimmed, elapsed time and threads), the parameters used, then tab-separated tables: one row per contig (length, reads, coverage, variants, strands, bases trimmed from each end); one per read placement (contig, read, strand, start, end, length, clipped bases); one per polymorphic site or tie (position, coverage, counts of A, C, G, T and gap, the IUPAC code, minor-allele fraction); one per accepted overlap (reads, strand, offset, length, identity, score, mismatches, gaps, containment and whether it joined, confirmed or conflicted with the layout); one per rejected overlap with its reason; one per layout conflict; the singletons with their length, GC content and repeat-word hits; the chimeric reads with their junctions; and the fold-back reads with their two copies and the part kept. The tables paste straight into a spreadsheet. |
+| `runs/sample1.79.contigs.fasta` | The consensus sequences, upper case, one record per contig. The header carries `length`, `reads`, `cov` (mean coverage), `snp` and `indel` (polymorphic sites called) and `tie` (evenly split columns, carried as IUPAC codes); a contig that is one allele of a product also carries `allele` (for example `1/2`) and `share` (its part of the separated reads). The alleles of a product follow one another, the one with the most reads first. Unassembled reads follow, marked as singletons, unless `--no-singletons`. |
+| `runs/sample1.79.report.txt` | The assembly report: a run summary (reads used, placed, singletons, chimeric and fold-back reads, contigs, total consensus, longest contig, N50, mean coverage, candidate pairs, overlaps accepted and rejected, layout conflicts, polymorphic sites, contig ends trimmed, elapsed time and threads), the parameters used, then tab-separated tables: one row per contig (length, reads, coverage, variants, strands, bases trimmed from each end); one per allele where a contig was separated into alleles (allele number, reads, share, reads shared with the other alleles, positions differing from the first allele); one per read placement (contig, read, strand, start, end, length, clipped bases); one per polymorphic site or tie (position, coverage, counts of A, C, G, T and gap, the IUPAC code, minor-allele fraction); one per accepted overlap (reads, strand, offset, length, identity, score, mismatches, gaps, containment and whether it joined, confirmed or conflicted with the layout); one per rejected overlap with its reason; one per layout conflict; the singletons with their length, GC content and repeat-word hits; the chimeric reads with their junctions; and the fold-back reads with their two copies and the part kept. The tables paste straight into a spreadsheet. |
 | `runs/sample1.79.log.txt` | The short log: input, seeding statistics, the measured error rate, threads used and any notices. |
 | `runs/sample1.79.placements.tsv` | With `--placements`: the read placement table alone, for downstream scripts. |
 | `runs/sample1.79.alignment.txt` | With `--alignment`: every read under its contig's consensus, a dot where the read agrees, `-` for a gap, the strand after the read name and `*` over polymorphic columns. |
