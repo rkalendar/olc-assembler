@@ -115,6 +115,8 @@ Assembly
   --no-chimera-check    Keep reads that look like two molecules joined in one read: no
                         fold-back trimming, no junction test, no chimeras set aside.
   --no-repeat-guard     Do not refuse joins across a repeat proven by divergence.
+  --no-alleles          Keep a contig whose reads fall into alleles as one sequence with
+                        ambiguity codes, instead of one sequence per allele.
   --no-singletons       Leave unassembled reads out of the FASTA.
   --set KEY=VALUE       Any other engine parameter by name (repeatable), e.g. --set minSeeds=2.
 
@@ -196,6 +198,7 @@ function parseArgs(argv) {
       case '--no-rc': o.engine.allowRC = false; break;
       case '--no-chimera-check': o.engine.chimeraCheck = false; break;
       case '--no-repeat-guard': o.engine.repeatGuard = false; break;
+      case '--no-alleles': o.engine.alleles = false; break;
       case '--no-singletons': o.engine.includeSingletons = false; break;
       case '--set': {
         const kv = takeValue(i, a); i++;
@@ -539,6 +542,7 @@ async function main() {
         (S.chimeras ? `, ${S.chimeras} chimeric read(s) set aside` : '') +
         (S.foldbacks || S.foldbacksDropped ? `, ${S.foldbacks} fold-back read(s) trimmed${S.foldbacksDropped ? ` and ${S.foldbacksDropped} dropped` : ''}` : '') +
         (S.trimmedBp ? `, ${fmt(S.trimmedBp)} bp of contig ends trimmed` : '') +
+        (S.alleles ? `, ${S.alleles} allele sequence(s) from ${S.alleleSets} contig(s)` : '') +
         `, ${secs.toFixed(1)} s on ${pool.runner.threadsUsed} thread(s)`);
     rows.push([label || 'all', b.seen, used, contigs.length, longest, totalBp, (result.singletons || []).length, pool.runner.threadsUsed, secs.toFixed(1), status]);
   }

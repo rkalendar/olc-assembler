@@ -26,6 +26,7 @@ k-mer 12 · min seeds 3 · min overlap 40 nt · min identity 85% · max overhang
 scoring: match 2, mismatch -3, gap open -5, gap extend -2 · band ±32 (max ±256)
 consensus: reads fitted with gap open -2 · homopolymer runs of ≥ 3 nt checked against the run lengths in the reads
 polymorphism: minor allele ≥ 25% and ≥ 2 read(s), column coverage ≥ 3 · votes weighted by PHRED quality when supplied
+alleles: reads of a contig separated at ≥ 2 linked positions · each allele ≥ 3 reads and ≥ 5% of the reads
 reverse-complement search: on · chimeric reads: set aside (fold-back copies ≥ 50 nt trimmed, junctions below 50% local identity refused) · contig ends need ≥ 3 reads (or 5% of the median coverage) in contigs at least twice that deep · min read length 40 nt
 
 Contigs
