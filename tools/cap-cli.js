@@ -26,9 +26,10 @@
         which dominates the runtime, is spread over worker_threads with exactly
         the contract of the page's Worker pool (js/cap-pool.js), so the result is
         identical to a single-thread run; only the wall-clock differs.
-     4. Writes, per group: <out>[.<bin>].contigs.fasta, .report.txt and .log.txt
-        (the same artefacts the page offers), plus <out>.bins.tsv summarising
-        every group.
+     4. Writes, per group: <out>[.<bin>].contigs.fasta (the contigs),
+        .singletons.fasta (the reads that joined no contig), .report.txt and
+        .log.txt (the same artefacts the page offers), plus <out>.bins.tsv
+        summarising every group.
 
    Memory: each group is held in memory only while it is assembled. If a group
    is large (thousands of long reads) and Node runs out of heap, raise it:
@@ -88,7 +89,7 @@ Input and grouping
   file inside it (plain or .gz), in name order: a MinKNOW fastq_pass/barcodeNN folder, say.
   --out PREFIX          Output prefix (default: the input file name without its extension,
                         in the current folder). Files: PREFIX[.BIN].contigs.fasta,
-                        .report.txt, .log.txt and PREFIX.bins.tsv.
+                        .singletons.fasta, .report.txt, .log.txt and PREFIX.bins.tsv.
   --bin-regex RE        Group reads by RE matched against the whole header line; the first
                         capture group (or the whole match) names the group, e.g.
                         "barcode(\\d+)" or "^(\\S+)_". Without it all reads form one group.
@@ -117,7 +118,8 @@ Assembly
   --no-repeat-guard     Do not refuse joins across a repeat proven by divergence.
   --no-alleles          Keep a contig whose reads fall into alleles as one sequence with
                         ambiguity codes, instead of one sequence per allele.
-  --no-singletons       Leave unassembled reads out of the FASTA.
+  --no-singletons       Do not write PREFIX[.BIN].singletons.fasta, the reads that joined
+                        no contig (they are never part of .contigs.fasta).
   --set KEY=VALUE       Any other engine parameter by name (repeatable), e.g. --set minSeeds=2.
 
 Output
@@ -530,7 +532,14 @@ async function main() {
     const contigs = result.contigs || [];
     const longest = contigs.reduce((m, c) => Math.max(m, (c.consensus || '').length), 0);
     const totalBp = contigs.reduce((m, c) => m + (c.consensus || '').length, 0);
-    fs.writeFileSync(prefix + '.contigs.fasta', CapReport.fasta(result, { includeSingletons }));
+    // Contigs and unassembled reads go to separate files: whatever reads
+    // .contigs.fasta gets consensus sequences only. A group with no singleton
+    // (or --no-singletons) gets no singletons file, and one left by an earlier
+    // run under the same prefix is removed so it cannot pass for this run's.
+    fs.writeFileSync(prefix + '.contigs.fasta', CapReport.fasta(result, { includeSingletons: false }));
+    const singletonsFasta = includeSingletons ? CapReport.fasta(result, { includeContigs: false }) : '';
+    if (singletonsFasta) fs.writeFileSync(prefix + '.singletons.fasta', singletonsFasta);
+    else fs.rmSync(prefix + '.singletons.fasta', { force: true });
     fs.writeFileSync(prefix + '.report.txt', CapReport.text(result));
     fs.writeFileSync(prefix + '.log.txt', CapReport.log(result).replace('(Web Workers)', '(worker threads)'));
     if (opts.alignment) fs.writeFileSync(prefix + '.alignment.txt', CapReport.alignmentText(result, { width: 100 }));
