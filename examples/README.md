@@ -75,8 +75,8 @@ node tools/cap-cli.js examples/nanopore/FAS90246_pass_barcode79_cfafe70b_765ba3f
 ```
 
 Reads shorter than 200 nt are dropped, the first 1000 of the rest are kept (the default
-`--max-reads`), and the singletons are left out of the FASTA to keep it small (they are still listed
-in the report). Expected (`nanopore/expected/barcode79.bins.tsv` and the report's run summary):
+`--max-reads`), and the 870 reads that joined no contig are not written out (`--no-singletons`;
+without it they go to `barcode79.79.singletons.fasta`; they are listed in the report either way). Expected (`nanopore/expected/barcode79.bins.tsv` and the report's run summary):
 
 | | |
 |---|---|
