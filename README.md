@@ -236,7 +236,8 @@ Assembly
   --no-repeat-guard     Do not refuse joins across a repeat proven by divergence.
   --no-alleles          Keep a contig whose reads fall into alleles as one sequence with
                         ambiguity codes, instead of one sequence per allele.
-  --no-singletons       Leave unassembled reads out of the FASTA.
+  --no-singletons       Do not write PREFIX[.BIN].singletons.fasta, the reads that joined
+                        no contig (they are never part of .contigs.fasta).
   --set KEY=VALUE       Any other engine parameter by name (repeatable), e.g. --set minSeeds=2.
 
 Output
@@ -259,7 +260,8 @@ For `--out runs/sample1` and a group named `79`:
 
 | File | Content |
 |---|---|
-| `runs/sample1.79.contigs.fasta` | The consensus sequences, upper case, one record per contig. The header carries `length`, `reads`, `cov` (mean coverage), `snp` and `indel` (polymorphic sites called) and `tie` (evenly split columns, carried as IUPAC codes); a contig that is one allele of a product also carries `allele` (for example `1/2`) and `share` (its part of the separated reads). The alleles of a product follow one another, the one with the most reads first. Unassembled reads follow, marked as singletons, unless `--no-singletons`. |
+| `runs/sample1.79.contigs.fasta` | The consensus sequences, upper case, one record per contig. The header carries `length`, `reads`, `cov` (mean coverage), `snp` and `indel` (polymorphic sites called) and `tie` (evenly split columns, carried as IUPAC codes); a contig that is one allele of a product also carries `allele` (for example `1/2`) and `share` (its part of the separated reads). The alleles of a product follow one another, the one with the most reads first. |
+| `runs/sample1.79.singletons.fasta` | The reads that joined no contig, as used by the assembly (after any trimming), each marked `unassembled` in its header. Written only when the group has such reads; `--no-singletons` leaves the file out. |
 | `runs/sample1.79.report.txt` | The assembly report: a run summary (reads used, placed, singletons, chimeric and fold-back reads, contigs, total consensus, longest contig, N50, mean coverage, candidate pairs, overlaps accepted and rejected, layout conflicts, polymorphic sites, contig ends trimmed, elapsed time and threads), the parameters used, then tab-separated tables: one row per contig (length, reads, coverage, variants, strands, bases trimmed from each end); one per allele where a contig was separated into alleles (allele number, reads, share, reads shared with the other alleles, positions differing from the first allele); one per read placement (contig, read, strand, start, end, length, clipped bases); one per polymorphic site or tie (position, coverage, counts of A, C, G, T and gap, the IUPAC code, minor-allele fraction); one per accepted overlap (reads, strand, offset, length, identity, score, mismatches, gaps, containment and whether it joined, confirmed or conflicted with the layout); one per rejected overlap with its reason; one per layout conflict; the singletons with their length, GC content and repeat-word hits; the chimeric reads with their junctions; and the fold-back reads with their two copies and the part kept. The tables paste straight into a spreadsheet. |
 | `runs/sample1.79.log.txt` | The short log: input, seeding statistics, the measured error rate, threads used and any notices. |
 | `runs/sample1.79.placements.tsv` | With `--placements`: the read placement table alone, for downstream scripts. |
