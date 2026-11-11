@@ -373,6 +373,9 @@
 
     /* ───────────────────────────── consensus FASTA ───────────────────────── */
 
+    // opts.includeContigs / opts.includeSingletons (both on unless false) choose
+    // what goes into the text: the page shows both in one view, the command
+    // line writes each to a file of its own.
     function capReportFasta(res, opts) {
         opts = opts || {};
         var width = opts.width || 60;
@@ -380,7 +383,7 @@
         var out = [];
         if (!res || !res.ok) return '';
 
-        res.contigs.forEach(function (c) {
+        if (opts.includeContigs !== false) res.contigs.forEach(function (c) {
             var snps = c.variants.filter(function (v) { return v.kind === 'snp'; }).length;
             var indels = c.variants.filter(function (v) { return v.kind === 'indel'; }).length;
             var ties = c.variants.filter(function (v) { return v.kind === 'tie'; }).length;
